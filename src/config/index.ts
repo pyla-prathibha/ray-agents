@@ -8,9 +8,14 @@ export const config = {
     baseUrl: "https://prod-api.ringg.ai/ca/api/v0",
     inboundAgentId: "4d03f9cd-320b-49bf-adbb-cbe8fdde9c59",
     inboundNumber: "+918031137408",
-    outboundAgentId: "35b9bb7d-c4ea-45eb-95c6-cc31f83e008f",
-    fromNumberId: "ffc7dd03-3a4d-46ef-9aab-5aba0699ad36",
-    fromNumber: "+912268095634",
+    // Post OPD Follow-up Agent
+    postOpdAgentId: "35b9bb7d-c4ea-45eb-95c6-cc31f83e008f",
+    postOpdFromNumberId: "ffc7dd03-3a4d-46ef-9aab-5aba0699ad36",
+    postOpdFromNumber: "+912268095634",
+    // Patient Reactivation Agent
+    reactivationAgentId: "60c6b2d5-46ca-4b4f-975a-c31f23cf8c3d",
+    reactivationFromNumberId: "ffc7dd03-3a4d-46ef-9aab-5aba0699ad36",
+    reactivationFromNumber: "+912268095634",
   },
   practo: {
     bearerToken: process.env.PRACTO_BEARER_TOKEN || "",

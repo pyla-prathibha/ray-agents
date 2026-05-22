@@ -1,16 +1,17 @@
 "use client";
 
-export type Panel = "inbound" | "outbound" | "demand";
+export type Panel = "inbound" | "outbound" | "reactivation" | "demand";
 
 interface SidebarProps {
   activePanel: Panel;
   onSwitch: (panel: Panel) => void;
 }
 
-const NAV_ITEMS: { id: Panel; icon: string; title: string; meta: string; badge: string; badgeClass: string }[] = [
-  { id: "inbound", icon: "📞", title: "Apt Booking · Inbound", meta: "Patient booking calls", badge: "Live", badgeClass: "badge-blue" },
-  { id: "outbound", icon: "📤", title: "Post OPD · Outbound", meta: "Post-consultation calls", badge: "8%", badgeClass: "badge-green" },
-  { id: "demand", icon: "📊", title: "Demand Gen · Report", meta: "Monthly growth metrics", badge: "May", badgeClass: "badge-purple" },
+const NAV_ITEMS: { id: Panel; icon: string; title: string; meta: string; badge: string; badgeClass: string; agent: string }[] = [
+  { id: "inbound", icon: "📞", title: "Apt Booking · Inbound", meta: "Patient booking calls", badge: "Live", badgeClass: "badge-blue", agent: "inbound" },
+  { id: "outbound", icon: "📤", title: "Post OPD · Outbound", meta: "Post-consultation calls", badge: "Active", badgeClass: "badge-green", agent: "outbound" },
+  { id: "reactivation", icon: "🔄", title: "Reactivation · Outbound", meta: "Dormant patient calls", badge: "Active", badgeClass: "badge-green", agent: "outbound" },
+  { id: "demand", icon: "📊", title: "Demand Gen · Report", meta: "Monthly growth metrics", badge: "May", badgeClass: "badge-purple", agent: "demand" },
 ];
 
 export function Sidebar({ activePanel, onSwitch }: SidebarProps) {
@@ -21,7 +22,7 @@ export function Sidebar({ activePanel, onSwitch }: SidebarProps) {
       {NAV_ITEMS.map((nav) => (
         <button
           key={nav.id}
-          data-agent={nav.id}
+          data-agent={nav.agent}
           className={`nav-item ${activePanel === nav.id ? "active" : ""}`}
           onClick={() => onSwitch(nav.id)}
         >

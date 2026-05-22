@@ -11,7 +11,7 @@ import {
   CUSTOM_PARAMS,
 } from "@/agents/outbound/data";
 
-interface OutboundPanelProps {
+interface ReactivationPanelProps {
   onToast: (msg: string) => void;
 }
 
@@ -38,7 +38,7 @@ const COHORT_STYLE: Record<string, React.CSSProperties> = {
 
 const STAT_LABELS = ["OPD Consults", "Followed Up", "Booked", "Consent"];
 
-export default function OutboundPanel({ onToast }: OutboundPanelProps) {
+export default function ReactivationPanel({ onToast }: ReactivationPanelProps) {
   const [phone, setPhone] = useState("");
   const [patientName, setPatientName] = useState("Anjali Sharma");
   const [doctorName, setDoctorName] = useState("Dr. Victor Mag");
@@ -219,7 +219,7 @@ export default function OutboundPanel({ onToast }: OutboundPanelProps) {
           mobile_number: ph.replace(/\D/g, ""),
           doctor_name: doctor,
           doctor_specialty: spec,
-          agent_type: "post-opd",
+          agent_type: "reactivation",
         }),
       });
 
@@ -272,13 +272,13 @@ export default function OutboundPanel({ onToast }: OutboundPanelProps) {
         <div>
           <div className="card-title">
             <span className="eyebrow-dot" style={{ color: "var(--green)", background: "var(--green)" }} />
-            Agent 2 · Outbound · Post OPD Follow-Up
+            Agent 3 · Outbound · Patient Reactivation
           </div>
-          <h2 className="page-title">Post OPD Dialler</h2>
+          <h2 className="page-title">Reactivation Dialler</h2>
           <p className="page-sub">
             Automated follow-up calls for post-OPD patients — schedule reviews, collect feedback, and drive rebookings.
           </p>
-          <div className="agent-id-chip">35b9bb7d-c4ea-45eb-95c6-cc31f83e008f</div>
+          <div className="agent-id-chip">60c6b2d5-46ca-4b4f-975a-c31f23cf8c3d</div>
         </div>
         <div className="call-status-card">
           <span className="eyebrow-dot" style={{
@@ -300,7 +300,7 @@ export default function OutboundPanel({ onToast }: OutboundPanelProps) {
         <div className="glow-card dial-card-green">
           <div className="glow-card-inner">
             <div className="dial-label dial-label-green">
-              📤 Trigger Outbound Post OPD Call
+              🔄 Trigger Patient Reactivation Call
             </div>
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
@@ -495,7 +495,7 @@ export default function OutboundPanel({ onToast }: OutboundPanelProps) {
         <div className="card">
           <div className="card-title">
             <span className="card-title-dot" style={{ background: "var(--green)" }} />
-            Post OPD Follow-Up Queue · This Month
+            Reactivation Queue · This Month
           </div>
 
           <table className="data-table">

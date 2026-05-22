@@ -5,6 +5,7 @@ import { Topbar } from "@/components/layout/Topbar";
 import { Sidebar, type Panel } from "@/components/layout/Sidebar";
 import InboundPanel from "@/components/panels/InboundPanel";
 import OutboundPanel from "@/components/panels/OutboundPanel";
+import ReactivationPanel from "@/components/panels/ReactivationPanel";
 import DemandGenPanel from "@/components/panels/DemandGenPanel";
 import { ToastContainer } from "@/components/shared/ToastContainer";
 import { useTheme } from "@/hooks/useTheme";
@@ -44,6 +45,9 @@ export default function Dashboard() {
           </div>
           <div style={{ display: activePanel === "outbound" ? "block" : "none" }}>
             <OutboundPanel onToast={showToast} />
+          </div>
+          <div style={{ display: activePanel === "reactivation" ? "block" : "none" }}>
+            <ReactivationPanel onToast={showToast} />
           </div>
           <div style={{ display: activePanel === "demand" ? "block" : "none" }}>
             <DemandGenPanel onToast={showToast} />
