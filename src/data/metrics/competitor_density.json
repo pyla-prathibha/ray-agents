@@ -1,0 +1,37 @@
+{
+  "total_dentists_in_radius": 8,
+  "average_competitor_rating": 4.1,
+  "top_3_ranked_competitors": [
+    {
+      "rank": 1,
+      "doctor_name": "Dr. New dentist",
+      "practice_name": "consultprimeclinic1",
+      "experience": "16 years",
+      "consultation_fee_inr": 54,
+      "is_cashless": false,
+      "qualifications": ["BDS"]
+    },
+    {
+      "rank": 2,
+      "doctor_name": "Dr. cashless v1",
+      "practice_name": "Newyork Test clinic",
+      "experience": "11 years",
+      "consultation_fee_inr": 50,
+      "is_cashless": true,
+      "qualifications": ["MBS (H)"]
+    },
+    {
+      "rank": 3,
+      "doctor_name": "Dr. Doctor CHC",
+      "practice_name": "Test work prime",
+      "experience": "9 years",
+      "consultation_fee_inr": 105,
+      "is_cashless": true,
+      "qualifications": ["BDS"]
+    }
+  ],
+  "competitor_insights": {
+    "cashless_offering_density_pct": 50.0,
+    "pricing_benchmark": "Competitors averaging INR 50-105 per consultation."
+  }
+}

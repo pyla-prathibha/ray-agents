@@ -1,0 +1,24 @@
+{
+  "category": "Dentistry & Dental Surgery",
+  "location_scope": "Bangalore, India",
+  "total_dental_searches_bangalore": 32000,
+  "primary_keyword": "dentist near me",
+  "primary_volume": 8100,
+  "mom_growth_pct": 12,
+  "top_keywords": [
+    { "keyword": "dentist near me", "monthly_searches": 8100, "intent": "high", "trend": "+12% MoM" },
+    { "keyword": "best dentist in Bangalore", "monthly_searches": 4400, "intent": "high", "trend": "+8% MoM" },
+    { "keyword": "root canal cost Bangalore", "monthly_searches": 2900, "intent": "transactional", "trend": "+15% MoM" },
+    { "keyword": "teeth cleaning near me", "monthly_searches": 1800, "intent": "moderate", "trend": "+5% MoM" },
+    { "keyword": "dental implants cost Bangalore", "monthly_searches": 1800, "intent": "transactional", "trend": "+22% MoM" },
+    { "keyword": "invisalign cost Bangalore", "monthly_searches": 1200, "intent": "transactional", "trend": "+28% MoM" },
+    { "keyword": "emergency dentist Bangalore", "monthly_searches": 880, "intent": "urgent", "trend": "+18% MoM" },
+    { "keyword": "teeth whitening near me", "monthly_searches": 720, "intent": "cosmetic", "trend": "+10% MoM" }
+  ],
+  "rising_queries": [
+    "digital smile design Bangalore",
+    "same day dental crown near me",
+    "laser root canal treatment",
+    "pediatric dentist weekend appointment"
+  ]
+}

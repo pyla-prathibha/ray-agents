@@ -1,0 +1,15 @@
+{
+  "city": "Bangalore",
+  "radius_km": 5,
+  "total_monthly_queries_in_radius": 1240,
+  "localities": [
+    { "name": "Koramangala", "monthly_dental_searches": 3200, "top_keyword": "dentist in Koramangala", "demo": "Tech professionals 25-40" },
+    { "name": "Indiranagar", "monthly_dental_searches": 2800, "top_keyword": "best dentist Indiranagar", "demo": "Young professionals 22-35" },
+    { "name": "HSR Layout", "monthly_dental_searches": 2400, "top_keyword": "dental clinic HSR Layout", "demo": "IT families 28-45" },
+    { "name": "Whitefield", "monthly_dental_searches": 2100, "top_keyword": "dentist near Whitefield", "demo": "Corporate employees 25-40" },
+    { "name": "Jayanagar", "monthly_dental_searches": 1900, "top_keyword": "dental hospital Jayanagar", "demo": "Families & retirees 35-65" },
+    { "name": "BTM Layout", "monthly_dental_searches": 1600, "top_keyword": "affordable dentist BTM", "demo": "Students & young workers 20-30" },
+    { "name": "Marathahalli", "monthly_dental_searches": 1400, "top_keyword": "root canal Marathahalli", "demo": "IT professionals 25-38" },
+    { "name": "Banashankari", "monthly_dental_searches": 1200, "top_keyword": "dentist Banashankari", "demo": "Residential families 30-55" }
+  ]
+}

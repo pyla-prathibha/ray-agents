@@ -1,0 +1,1805 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Ray · AI Agent Command Centre</title>
+<meta name="description" content="Ray AI Practice Growth Engine — Command Centre for managing AI voice agents, appointment booking, and demand generation."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  /* LIGHT THEME VARIABLES */
+  --bg: #f4f6fa;
+  --white: #ffffff;
+  --surface: #ffffff;
+  --surface-hover: #fafbfc;
+  --surface-2: #f8fafc;
+  --surface-3: #eef2f6;
+  --border: #e2e8f0;
+  --border-2: #cbd5e1;
+  --border-3: #94a3b8;
+  --text: #0f172a;
+  --text-2: #334155;
+  --text-muted: #64748b;
+  --text-muted-darker: #475569;
+
+  --blue: #2563eb;
+  --blue-light: #eff6ff;
+  --blue-mid: #dbeafe;
+  --blue-deep: #1d4ed8;
+  --blue-text: #1e40af;
+
+  --green: #10b981;
+  --green-light: #ecfdf5;
+  --green-mid: #d1fae5;
+  --green-deep: #047857;
+  --green-text: #065f46;
+
+  --purple: #8b5cf6;
+  --purple-light: #f5f3ff;
+  --purple-mid: #ede9fe;
+  --purple-deep: #6d28d9;
+  --purple-text: #5b21b6;
+
+  --orange: #f59e0b;
+  --orange-light: #fffbeb;
+  --orange-mid: #fef3c7;
+  --orange-text: #92400e;
+
+  --red: #ef4444;
+  --red-light: #fef2f2;
+  --red-text: #991b1b;
+
+  --cyan: #06b6d4;
+  --cyan-light: #ecfeff;
+  --cyan-text: #075985;
+
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03);
+  --shadow-md: 0 4px 16px rgba(15,23,42,0.05), 0 2px 6px rgba(15,23,42,0.03);
+  --shadow-lg: 0 12px 32px rgba(15,23,42,0.08), 0 4px 12px rgba(15,23,42,0.04);
+  --shadow-glow-blue: 0 0 24px rgba(37,99,235,0.12);
+  --shadow-glow-green: 0 0 24px rgba(16,185,129,0.12);
+  --shadow-glow-purple: 0 0 24px rgba(139,92,246,0.12);
+  
+  --backdrop-blur: blur(20px) saturate(1.4);
+  --surface-blur: rgba(255, 255, 255, 0.7);
+}
+
+[data-theme="dark"] {
+  /* CYBERNETIC PREMIUM DARK THEME VARIABLES */
+  --bg: #090d16;
+  --white: #0e131f;
+  --surface: #0e1320;
+  --surface-hover: #151c2d;
+  --surface-2: #101626;
+  --surface-3: #1b2438;
+  --border: #1a2336;
+  --border-2: #24324f;
+  --border-3: #3b4f76;
+  --text: #f8fafc;
+  --text-2: #e2e8f0;
+  --text-muted: #94a3b8;
+  --text-muted-darker: #cbd5e1;
+
+  --blue: #3b82f6;
+  --blue-light: rgba(59,130,246,0.1);
+  --blue-mid: rgba(59,130,246,0.2);
+  --blue-deep: #2563eb;
+  --blue-text: #93c5fd;
+
+  --green: #10b981;
+  --green-light: rgba(16,185,129,0.1);
+  --green-mid: rgba(16,185,129,0.2);
+  --green-deep: #059669;
+  --green-text: #6ee7b7;
+
+  --purple: #a78bfa;
+  --purple-light: rgba(167,139,250,0.1);
+  --purple-mid: rgba(167,139,250,0.2);
+  --purple-deep: #8b5cf6;
+  --purple-text: #c4b5fd;
+
+  --orange: #fbbf24;
+  --orange-light: rgba(251,191,36,0.1);
+  --orange-mid: rgba(251,191,36,0.2);
+  --orange-text: #fde047;
+
+  --red: #f87171;
+  --red-light: rgba(248,113,113,0.1);
+  --red-text: #fca5a5;
+
+  --cyan: #22d3ee;
+  --cyan-light: rgba(34,211,238,0.1);
+  --cyan-text: #67e8f9;
+
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+  --shadow-md: 0 8px 24px rgba(0,0,0,0.4);
+  --shadow-lg: 0 16px 48px rgba(0,0,0,0.5);
+  --shadow-glow-blue: 0 0 28px rgba(59,130,246,0.2);
+  --shadow-glow-green: 0 0 28px rgba(16,185,129,0.2);
+  --shadow-glow-purple: 0 0 28px rgba(167,139,250,0.2);
+
+  --backdrop-blur: blur(20px) saturate(1.8);
+  --surface-blur: rgba(14, 19, 31, 0.7);
+}
+
+*{box-sizing:border-box;margin:0;padding:0;transition:background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple-system,sans-serif;overflow:hidden;-webkit-font-smoothing:antialiased}
+
+/* ─── DYNAMIC VECTOR ORBS BACKGROUND ─── */
+.mesh-bg {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; opacity: 0.8;
+}
+.glow-orb {
+  position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.15;
+  animation: orbFloat 22s ease-in-out infinite alternate;
+}
+.orb-1 {
+  top: -10%; left: 10%; width: 450px; height: 450px;
+  background: radial-gradient(circle, var(--blue) 0%, transparent 80%);
+}
+.orb-2 {
+  bottom: -15%; right: 10%; width: 500px; height: 500px;
+  background: radial-gradient(circle, var(--purple) 0%, transparent 80%);
+  animation-delay: -5s; animation-duration: 28s;
+}
+.orb-3 {
+  top: 40%; left: 50%; width: 350px; height: 350px;
+  background: radial-gradient(circle, var(--green) 0%, transparent 80%);
+  animation-delay: -10s; animation-duration: 25s;
+  opacity: 0.08;
+}
+@keyframes orbFloat {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(60px, -40px) scale(1.1); }
+  100% { transform: translate(-40px, 50px) scale(0.9); }
+}
+
+.dot-grid {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image: radial-gradient(circle, var(--border-3) 0.8px, transparent 0.8px);
+  background-size: 24px 24px; opacity: 0.1;
+}
+
+/* ─── LAYOUT ─── */
+.shell { position: relative; z-index: 1; display: grid; grid-template-columns: 260px 1fr; grid-template-rows: 64px 1fr; height: 100vh; overflow: hidden; }
+
+/* ─── TOPBAR ─── */
+.topbar {
+  grid-column: 1/-1; display: flex; align-items: center; justify-content: space-between;
+  padding: 0 28px; height: 64px; border-bottom: 1px solid var(--border);
+  background: var(--surface-blur); backdrop-filter: var(--backdrop-blur); z-index: 10;
+}
+.logo { display: flex; align-items: center; gap: 12px; }
+.logo-mark {
+  width: 36px; height: 36px; border-radius: 12px;
+  background: linear-gradient(135deg, #2563eb, #8b5cf6, #34d399);
+  background-size: 200% 200%; animation: logoGlow 6s ease infinite;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 900; color: #fff;
+  box-shadow: 0 4px 12px rgba(37,99,235,0.25);
+}
+@keyframes logoGlow { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
+.logo-text { font-weight: 800; font-size: 17px; letter-spacing: -0.02em; color: var(--text); }
+.logo-text span { background: linear-gradient(135deg, var(--blue), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.logo-sub { color: var(--text-muted); font-size: 12.5px; font-weight: 500; margin-left: 6px; }
+
+.ai-wave { display: flex; align-items: center; gap: 3px; padding: 0 6px; }
+.ai-wave-bar { width: 3px; border-radius: 3px; background: var(--blue); animation: wave 1.4s ease-in-out infinite; }
+.ai-wave-bar:nth-child(1) { height: 8px; animation-delay: 0s; }
+.ai-wave-bar:nth-child(2) { height: 16px; animation-delay: 0.15s; }
+.ai-wave-bar:nth-child(3) { height: 11px; animation-delay: 0.3s; }
+.ai-wave-bar:nth-child(4) { height: 18px; animation-delay: 0.45s; }
+.ai-wave-bar:nth-child(5) { height: 8px; animation-delay: 0.6s; }
+@keyframes wave { 0%,100%{transform:scaleY(0.4);opacity:0.4} 50%{transform:scaleY(1);opacity:1} }
+
+.topbar-right { display: flex; align-items: center; gap: 12px; }
+.status-live {
+  display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 600;
+  color: var(--green-text); padding: 6px 14px; background: var(--green-light);
+  border: 1px solid var(--green-mid); border-radius: 20px;
+}
+.pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,0.6)} 50%{box-shadow:0 0 0 8px rgba(16,185,129,0)} }
+.time-badge { font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--text-muted); border: 1px solid var(--border); padding: 6px 12px; border-radius: 10px; background: var(--surface-2); font-weight: 500; }
+.env-badge { font-size: 10px; font-weight: 700; padding: 5px 12px; border-radius: 20px; background: var(--blue-light); border: 1px solid var(--blue-mid); color: var(--blue-text); letter-spacing: 0.05em; text-transform: uppercase; }
+
+.theme-btn {
+  background: var(--surface-2); border: 1px solid var(--border); color: var(--text-2);
+  width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center;
+  font-size: 16px; cursor: pointer; transition: all 0.2s ease;
+}
+.theme-btn:hover { background: var(--surface-3); transform: scale(1.05); }
+.theme-btn-icon { display: inline-block; transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+/* ─── SIDEBAR ─── */
+.sidebar {
+  border-right: 1px solid var(--border); padding: 24px 16px;
+  display: flex; flex-direction: column; gap: 3px; background: var(--white); overflow-y: auto;
+}
+.sidebar-label { font-size: 10px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); padding: 0 12px; margin: 24px 0 8px; }
+.sidebar-label:first-child { margin-top: 0; }
+.nav-item {
+  display: flex; align-items: center; gap: 12px; padding: 11px 14px; border-radius: 14px;
+  cursor: pointer; transition: all 0.25s; font-size: 13.5px; font-weight: 500; color: var(--text-muted);
+  border: 1px solid transparent; position: relative;
+}
+.nav-item:hover { background: var(--surface-3); color: var(--text); }
+.nav-item.active { color: var(--text); border-color: var(--border-2); font-weight: 600; background: var(--surface-2); }
+.nav-item[data-agent="inbound"].active { background: var(--blue-light); border-color: var(--blue-mid); color: var(--blue-text); }
+.nav-item[data-agent="outbound"].active { background: var(--green-light); border-color: var(--green-mid); color: var(--green-text); }
+.nav-item[data-agent="demand"].active { background: var(--purple-light); border-color: var(--purple-mid); color: var(--purple-text); }
+.nav-item.active::before { content: ''; position: absolute; left: 0; top: 22%; bottom: 22%; width: 4px; border-radius: 3px; }
+.nav-item[data-agent="inbound"].active::before { background: var(--blue); }
+.nav-item[data-agent="outbound"].active::before { background: var(--green); }
+.nav-item[data-agent="demand"].active::before { background: var(--purple); }
+
+.nav-icon { width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; transition: all 0.2s; }
+.nav-item[data-agent="inbound"] .nav-icon { background: var(--blue-light); }
+.nav-item[data-agent="outbound"] .nav-icon { background: var(--green-light); }
+.nav-item[data-agent="demand"] .nav-icon { background: var(--purple-light); }
+.nav-item[data-agent="inbound"].active .nav-icon { background: var(--blue-mid); }
+.nav-item[data-agent="outbound"].active .nav-icon { background: var(--green-mid); }
+.nav-item[data-agent="demand"].active .nav-icon { background: var(--purple-mid); }
+.nav-item-text { overflow: hidden; }
+.nav-item-title { font-size: 13.5px; line-height: 1.3; }
+.nav-meta { font-size: 10.5px; color: var(--text-muted); margin-top: 2px; }
+.nav-badge { margin-left: auto; font-size: 9.5px; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
+.badge-blue { background: var(--blue-mid); color: var(--blue-text); }
+.badge-green { background: var(--green-mid); color: var(--green-text); }
+.badge-purple { background: var(--purple-mid); color: var(--purple-text); }
+
+.sidebar-section { padding: 0 4px; display: flex; flex-direction: column; gap: 6px; }
+.env-card { font-size: 11px; color: var(--text-muted); padding: 12px 14px; background: var(--surface-2); border-radius: 12px; border: 1px solid var(--border); }
+.env-card-label { color: var(--text-muted); margin-bottom: 4px; font-weight: 800; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; }
+.env-card-val { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-2); }
+
+.sidebar-footer { margin-top: auto; padding: 16px; background: linear-gradient(135deg, var(--blue-light), var(--purple-light)); border-radius: 14px; border: 1px solid var(--border); }
+.sf-label { font-size: 9px; color: var(--text-muted); margin-bottom: 6px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
+.sf-id { font-size: 11.5px; color: var(--text-2); line-height: 1.6; font-weight: 600; }
+
+/* ─── MAIN ─── */
+.main { overflow-y: auto; padding: 32px 40px 64px; display: flex; flex-direction: column; gap: 24px; background: transparent; position: relative; z-index: 2; }
+
+/* ─── PANEL ─── */
+.panel { display: none; }
+.panel.active { display: flex; flex-direction: column; gap: 24px; }
+
+/* ─── PAGE HEADER ─── */
+.page-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.page-eyebrow { font-size: 11px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+.eyebrow-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; position: relative; }
+.eyebrow-dot::after { content: ''; position: absolute; inset: -4px; border-radius: 50%; border: 2.5px solid currentColor; opacity: 0.3; animation: ringPulse 2s infinite; }
+@keyframes ringPulse { 0%,100%{transform:scale(1);opacity:0.3} 50%{transform:scale(1.5);opacity:0} }
+.page-title { font-size: 30px; font-weight: 800; line-height: 1.2; margin-bottom: 6px; letter-spacing: -0.03em; }
+.page-sub { font-size: 14px; color: var(--text-muted); line-height: 1.7; max-width: 620px; }
+.agent-id-chip {
+  display: inline-flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  padding: 6px 14px; border-radius: 10px; border: 1px solid var(--border); color: var(--text-muted);
+  margin-top: 10px; cursor: pointer; transition: all 0.2s; background: var(--surface-2);
+}
+.agent-id-chip:hover { border-color: var(--blue); color: var(--blue-text); background: var(--blue-light); }
+
+/* ─── CARDS ─── */
+.card {
+  background: var(--surface-blur);
+  backdrop-filter: var(--backdrop-blur);
+  -webkit-backdrop-filter: var(--backdrop-blur);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.card:hover {
+  box-shadow: var(--shadow-md), 0 0 0 1px var(--border-2);
+  border-color: var(--border-2);
+  transform: translateY(-2px);
+}
+.card-title { font-size: 11.5px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+.card-title-dot { width: 4px; height: 15px; border-radius: 2px; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
+
+/* ─── GLOW / PREMIUM GLASS CARD ─── */
+.glow-card {
+  position: relative; border-radius: 24px; overflow: hidden; transition: all 0.35s ease;
+  box-shadow: var(--shadow-sm);
+}
+.glow-card::before {
+  content: ''; position: absolute; inset: 0; padding: 1.5px; border-radius: 24px;
+  background: linear-gradient(135deg, var(--accent1), var(--accent2), var(--accent3));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  opacity: 0.6; transition: opacity 0.3s;
+}
+.glow-card:hover::before { opacity: 1; }
+.glow-card-inner {
+  background: var(--card-bg); border-radius: 23px; padding: 30px; position: relative; z-index: 1;
+}
+
+/* DIAL & TRIGGER DETAILS */
+.dial-card {
+  --accent1: #3b82f6; --accent2: #8b5cf6; --accent3: #60a5fa;
+  --card-bg: linear-gradient(135deg, var(--blue-light), var(--surface));
+}
+.dial-card-green {
+  --accent1: #10b981; --accent2: #059669; --accent3: #34d399;
+  --card-bg: linear-gradient(135deg, var(--green-light), var(--surface));
+}
+.dial-label { font-size: 13px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+.dial-label-blue { color: var(--blue-text); }
+.dial-label-green { color: var(--green-text); }
+.phone-input-wrap { display: flex; gap: 12px; margin-bottom: 16px; }
+.country-code {
+  border-radius: 14px; padding: 0 18px; font-family: 'JetBrains Mono', monospace; font-size: 15px;
+  display: flex; align-items: center; white-space: nowrap; font-weight: 600;
+}
+.cc-blue { background: var(--blue-mid); border: 1px solid var(--blue-mid); color: var(--blue-text); }
+.cc-green { background: var(--green-mid); border: 1px solid var(--green-mid); color: var(--green-text); }
+.phone-input {
+  flex: 1; background: var(--white); border: 2px solid var(--border); border-radius: 14px;
+  padding: 14px 20px; font-family: 'JetBrains Mono', monospace; font-size: 18px;
+  color: var(--text); outline: none; transition: all 0.25s; letter-spacing: 0.04em;
+}
+.phone-input:focus { border-color: var(--blue); box-shadow: 0 0 0 5px var(--blue-mid); }
+.phone-input.green-focus:focus { border-color: var(--green); box-shadow: 0 0 0 5px var(--green-mid); }
+.phone-input::placeholder { color: var(--text-muted); }
+.text-input {
+  width: 100%; background: var(--white); border: 2px solid var(--border); border-radius: 14px;
+  padding: 12px 18px; font-family: 'Inter', sans-serif; font-size: 14.5px;
+  color: var(--text); outline: none; transition: all 0.25s; margin-bottom: 16px;
+}
+.text-input:focus { border-color: var(--green); box-shadow: 0 0 0 4px var(--green-mid); }
+.text-input::placeholder { color: var(--text-muted); }
+.input-label { font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; display: block; letter-spacing: 0.04em; text-transform: uppercase; }
+
+.trigger-btn {
+  width: 100%; padding: 16px; border-radius: 16px; border: none;
+  color: #fff; font-size: 14.5px; font-weight: 700;
+  cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); letter-spacing: 0.02em;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  position: relative; overflow: hidden;
+}
+.trigger-btn::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transform: translateX(-100%); transition: transform 0.8s;
+}
+.trigger-btn:hover::after { transform: translateX(100%); }
+.btn-blue { background: linear-gradient(135deg, var(--blue-deep), var(--blue)); box-shadow: 0 4px 16px rgba(37,99,235,0.25); }
+.btn-blue:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(37,99,235,0.35); }
+.btn-green { background: linear-gradient(135deg, var(--green-deep), var(--green)); box-shadow: 0 4px 16px rgba(16,185,129,0.25); }
+.btn-green:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(16,185,129,0.35); }
+.trigger-btn:active { transform: translateY(0); }
+.trigger-btn.loading { opacity: 0.7; cursor: not-allowed; transform: none; }
+
+.webhook-note {
+  font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 8px;
+  margin-top: 16px; padding: 12px 16px; background: var(--white);
+  border-radius: 12px; border: 1px solid var(--border); line-height: 1.6;
+}
+.webhook-note code { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; padding: 2px 6px; border-radius: 6px; font-weight: 600; }
+.code-blue { color: var(--blue-text); background: var(--blue-light); }
+.code-green { color: var(--green-text); background: var(--green-light); }
+
+/* ─── AUDIO SPEECH WAVEFORM ─── */
+.waveform-container {
+  display: flex; align-items: center; justify-content: center; gap: 4px;
+  height: 48px; width: 100%; margin: 16px 0; background: var(--surface-2);
+  border-radius: 12px; border: 1px solid var(--border); overflow: hidden; position: relative;
+}
+.waveform-label {
+  position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+  font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--text-muted); z-index: 2; pointer-events: none;
+}
+.wave-bar {
+  width: 3px; height: 8px; background: linear-gradient(to top, var(--blue) 0%, var(--purple) 100%); border-radius: 3px;
+  transform: scaleY(1); transition: transform 0.15s ease, background 0.3s ease;
+  animation: breathe 2s ease-in-out infinite alternate;
+}
+.waveform-container.green .wave-bar {
+  background: linear-gradient(to top, var(--green) 0%, var(--cyan) 100%);
+}
+/* Stagger the breathe animation delays for a wave effect */
+.waveform-container .wave-bar:nth-child(1) { animation-delay: 0.05s; }
+.waveform-container .wave-bar:nth-child(2) { animation-delay: 0.1s; }
+.waveform-container .wave-bar:nth-child(3) { animation-delay: 0.15s; }
+.waveform-container .wave-bar:nth-child(4) { animation-delay: 0.2s; }
+.waveform-container .wave-bar:nth-child(5) { animation-delay: 0.25s; }
+.waveform-container .wave-bar:nth-child(6) { animation-delay: 0.3s; }
+.waveform-container .wave-bar:nth-child(7) { animation-delay: 0.35s; }
+.waveform-container .wave-bar:nth-child(8) { animation-delay: 0.4s; }
+.waveform-container .wave-bar:nth-child(9) { animation-delay: 0.45s; }
+.waveform-container .wave-bar:nth-child(10) { animation-delay: 0.5s; }
+.waveform-container .wave-bar:nth-child(11) { animation-delay: 0.55s; }
+.waveform-container .wave-bar:nth-child(12) { animation-delay: 0.6s; }
+.waveform-container .wave-bar:nth-child(13) { animation-delay: 0.65s; }
+.waveform-container .wave-bar:nth-child(14) { animation-delay: 0.7s; }
+.waveform-container .wave-bar:nth-child(15) { animation-delay: 0.75s; }
+.waveform-container .wave-bar:nth-child(16) { animation-delay: 0.8s; }
+.waveform-container .wave-bar:nth-child(17) { animation-delay: 0.85s; }
+.waveform-container .wave-bar:nth-child(18) { animation-delay: 0.9s; }
+.waveform-container .wave-bar:nth-child(19) { animation-delay: 0.95s; }
+.waveform-container .wave-bar:nth-child(20) { animation-delay: 1.0s; }
+.waveform-container .wave-bar:nth-child(21) { animation-delay: 1.05s; }
+.waveform-container .wave-bar:nth-child(22) { animation-delay: 1.1s; }
+.waveform-container .wave-bar:nth-child(23) { animation-delay: 1.15s; }
+.waveform-container .wave-bar:nth-child(24) { animation-delay: 1.2s; }
+.waveform-container .wave-bar:nth-child(25) { animation-delay: 1.25s; }
+.waveform-container .wave-bar:nth-child(26) { animation-delay: 1.3s; }
+.waveform-container .wave-bar:nth-child(27) { animation-delay: 1.35s; }
+.waveform-container .wave-bar:nth-child(28) { animation-delay: 1.4s; }
+.waveform-container .wave-bar:nth-child(29) { animation-delay: 1.45s; }
+.waveform-container .wave-bar:nth-child(30) { animation-delay: 1.5s; }
+.waveform-container .wave-bar:nth-child(31) { animation-delay: 1.55s; }
+.waveform-container .wave-bar:nth-child(32) { animation-delay: 1.6s; }
+.waveform-container .wave-bar:nth-child(33) { animation-delay: 1.65s; }
+.waveform-container .wave-bar:nth-child(34) { animation-delay: 1.7s; }
+.waveform-container .wave-bar:nth-child(35) { animation-delay: 1.75s; }
+
+@keyframes breathe {
+  0% { transform: scaleY(1); opacity: 0.35; }
+  100% { transform: scaleY(1.8); opacity: 0.65; }
+}
+
+/* Active speaking animation */
+.waveform-container.active .wave-bar {
+  animation: activeDance 1.0s ease-in-out infinite alternate;
+}
+.waveform-container.active .wave-bar:nth-child(2n) { animation-delay: 0.05s; animation-duration: 0.7s; }
+.waveform-container.active .wave-bar:nth-child(3n) { animation-delay: 0.15s; animation-duration: 1.1s; }
+.waveform-container.active .wave-bar:nth-child(5n) { animation-delay: 0.25s; animation-duration: 0.9s; }
+.waveform-container.active .wave-bar:nth-child(7n) { animation-delay: 0.35s; animation-duration: 1.3s; }
+
+@keyframes activeDance {
+  0% { transform: scaleY(1.2); opacity: 0.7; }
+  50% { transform: scaleY(4.5); opacity: 1; }
+  100% { transform: scaleY(0.7); opacity: 0.5; }
+}
+
+/* ─── LIVE CHAT TRANSCRIPT SIMULATOR ─── */
+.chat-window {
+  background: var(--surface-2); border: 1px solid var(--border); border-radius: 16px;
+  padding: 20px; display: flex; flex-direction: column; gap: 12px; height: 320px;
+  overflow-y: auto; scroll-behavior: smooth; position: relative;
+}
+.chat-placeholder {
+  position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 8px; color: var(--text-muted); font-size: 13px; text-align: center;
+  padding: 24px; transition: opacity 0.3s ease; z-index: 1; pointer-events: none;
+}
+.chat-placeholder svg { width: 36px; height: 36px; stroke: var(--text-muted); opacity: 0.7; }
+.chat-bubble {
+  max-width: 80%; padding: 12px 16px; border-radius: 16px; font-size: 13px; line-height: 1.5;
+  box-shadow: var(--shadow-sm); animation: bubblePop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  opacity: 0; transform: translateY(8px);
+}
+@keyframes bubblePop { to { opacity: 1; transform: translateY(0); } }
+.chat-bubble.ai {
+  background: var(--surface); border: 1px solid var(--border);
+  align-self: flex-start; border-bottom-left-radius: 3px;
+}
+.chat-bubble.ai .sender { font-weight: 800; font-size: 9.5px; text-transform: uppercase; color: var(--blue); margin-bottom: 4px; display: block; letter-spacing: 0.05em; }
+.chat-bubble.ai.green .sender { color: var(--green); }
+.chat-bubble.patient {
+  background: var(--blue-mid); color: var(--blue-text);
+  align-self: flex-end; border-bottom-right-radius: 3px;
+}
+.chat-bubble.patient.green {
+  background: var(--green-mid); color: var(--green-text);
+}
+.chat-bubble.patient .sender { font-weight: 800; font-size: 9.5px; text-transform: uppercase; color: var(--blue-text); margin-bottom: 4px; display: block; letter-spacing: 0.05em; }
+.chat-bubble.patient.green .sender { color: var(--green-text); }
+
+/* Typing indicator */
+.typing-indicator { display: inline-flex; align-items: center; gap: 4px; padding: 4px 6px; }
+.typing-indicator span { width: 6px; height: 6px; border-radius: 50%; background: var(--text-muted); animation: typingBounce 1.2s infinite; }
+.typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+.typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typingBounce { 0%,100% { transform: translateY(0); opacity: 0.4; } 50% { transform: translateY(-4px); opacity: 1; } }
+
+/* ─── LIVE WEBHOOK / API PAYLOAD DEBUGGER ─── */
+.debugger-card {
+  background: #0d121f !important; border: 1px solid #1e293b !important; border-radius: 20px; overflow: hidden;
+}
+.debugger-header {
+  background: #151d30; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid #1e293b;
+}
+.debugger-title { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: #94a3b8; display: flex; align-items: center; gap: 8px; }
+.debugger-dot { width: 7px; height: 7px; border-radius: 50%; background: #64748b; }
+.debugger-dot.active { background: #38bdf8; animation: beaconPulse 1.5s infinite; }
+@keyframes beaconPulse { 0% { box-shadow: 0 0 0 0 rgba(56,189,248,0.5); } 100% { box-shadow: 0 0 0 6px rgba(56,189,248,0); } }
+.debugger-body {
+  padding: 18px; font-family: 'JetBrains Mono', monospace; font-size: 11px; line-height: 1.7;
+  color: #a5b4c8; max-height: 250px; overflow-y: auto;
+}
+
+/* ─── CALL STATUS ─── */
+.call-status-card { display: flex; align-items: center; gap: 12px; padding: 12px 18px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; box-shadow: var(--shadow-sm); }
+
+/* ─── TIMELINE EVENT LOG ─── */
+.event-log { display: flex; flex-direction: column; gap: 0; position: relative; }
+.event-log::before { content: ''; position: absolute; left: 18px; top: 20px; bottom: 20px; width: 2px; background: var(--border); border-radius: 1px; z-index: 0; }
+.event-row { display: flex; align-items: center; gap: 14px; padding: 12px 16px; border-radius: 12px; transition: all 0.2s; position: relative; z-index: 1; }
+.event-row:hover { background: var(--surface-2); }
+.event-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; transition: all 0.3s; border: 2.5px solid var(--white); box-shadow: 0 0 0 2px var(--border); }
+.event-dot.blue { background: var(--blue); box-shadow: 0 0 0 2.5px var(--blue-mid), 0 0 10px var(--accent-blue-glow); }
+.event-dot.green { background: var(--green); box-shadow: 0 0 0 2.5px var(--green-mid), 0 0 10px var(--accent-green-glow); }
+.event-dot.muted { background: var(--border-3); }
+.event-dot.orange { background: var(--orange); box-shadow: 0 0 0 2.5px var(--orange-mid), 0 0 10px var(--accent-orange-glow); }
+.event-name { font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--text-muted); flex: 1; transition: color 0.3s; font-weight: 600; }
+.event-time { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: var(--text-muted); }
+.event-status { font-size: 9.5px; font-weight: 800; padding: 3px 9px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.04em; }
+
+/* ─── TABLES ─── */
+.table-wrap { width: 100%; overflow-x: auto; margin-top: 10px; }
+.data-table { width: 100%; border-collapse: collapse; text-align: left; }
+.data-table th { font-size: 10px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); padding: 0 14px 14px; border-bottom: 1px solid var(--border); }
+.data-table td { padding: 14px 14px; border-bottom: 1px solid var(--border); font-size: 13px; color: var(--text-2); }
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr:hover td { background: var(--surface-2); }
+.phone-mono { font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: var(--text); font-weight: 600; }
+
+/* ─── PILLS / BADGES ─── */
+.pill { font-size: 10px; font-weight: 800; padding: 4px 12px; border-radius: 20px; display: inline-block; text-transform: uppercase; letter-spacing: 0.04em; }
+.pill-booked { background: var(--green-light); color: var(--green-text); border: 1px solid var(--green-mid); }
+.pill-pending { background: var(--orange-light); color: var(--orange-text); border: 1px solid var(--orange-mid); }
+.pill-failed { background: var(--red-light); color: var(--red-text); border: 1px solid rgba(239,68,68,0.2); }
+.pill-live { background: var(--blue-light); color: var(--blue-text); border: 1px solid var(--blue-mid); animation: blink 1.8s infinite; }
+.pill-called { background: var(--blue-light); color: var(--blue-text); border: 1px solid var(--blue-mid); }
+.pill-voicemail { background: var(--red-light); color: var(--red-text); border: 1px solid rgba(239,68,68,0.2); }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.45} }
+
+/* ─── STAT CARDS ─── */
+.stat-chip {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
+  padding: 22px; text-align: center; transition: all 0.3s ease; position: relative; overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+.stat-chip:hover { box-shadow: var(--shadow-md); transform: translateY(-4px); }
+.stat-chip::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; border-radius: 20px 20px 0 0; }
+.stat-chip:nth-child(1)::before { background: linear-gradient(90deg, var(--blue-deep), var(--blue)); }
+.stat-chip:nth-child(2)::before { background: linear-gradient(90deg, var(--green-deep), var(--green)); }
+.stat-chip:nth-child(3)::before { background: linear-gradient(90deg, var(--purple-deep), var(--purple)); }
+.stat-chip:nth-child(4)::before { background: linear-gradient(90deg, var(--orange-text), var(--orange)); }
+.stat-val { font-size: 32px; font-weight: 800; line-height: 1; margin-bottom: 8px; letter-spacing: -0.02em; }
+.stat-label { font-size: 10px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); }
+.stat-delta { font-size: 11px; margin-top: 6px; font-weight: 600; }
+
+/* ─── MINI STATS ─── */
+.stats-mini-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.stats-mini-item { padding: 18px; background: var(--surface-2); border-radius: 16px; border: 1px solid var(--border); text-align: center; transition: all 0.2s; }
+.stats-mini-item:hover { border-color: var(--border-2); transform: scale(1.03); }
+.stats-mini-val { font-size: 30px; font-weight: 800; line-height: 1; letter-spacing: -0.02em; }
+.stats-mini-label { font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-top: 6px; font-weight: 800; }
+
+/* ─── FROM NUMBER HERO ─── */
+.from-number-hero {
+  --accent1: #10b981; --accent2: #059669; --accent3: #34d399;
+  --card-bg: linear-gradient(135deg, var(--green-light), var(--surface));
+}
+.from-icon {
+  width: 60px; height: 60px; border-radius: 18px;
+  background: linear-gradient(135deg, var(--green-deep), var(--green));
+  display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0;
+  box-shadow: 0 4px 16px rgba(16,185,129,0.3);
+}
+.from-label { font-size: 10px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--green-text); margin-bottom: 4px; }
+.from-number-text { font-family: 'JetBrains Mono', monospace; font-size: 24px; font-weight: 800; color: var(--text); letter-spacing: 0.03em; line-height: 1; }
+.from-sub { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+.from-id-row { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+.from-id-chip { font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 6px 12px; border-radius: 10px; background: var(--green-light); border: 1px solid var(--green-mid); color: var(--text-muted); transition: all 0.2s; cursor: default; }
+.from-id-chip span { color: var(--green-text); font-weight: 600; }
+
+/* ─── INPUT PARAMETERS ─── */
+.param-group-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 8px; padding: 0 4px; display: flex; align-items: center; gap: 8px; }
+.param-dot { width: 6px; height: 6px; border-radius: 50%; }
+.param-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-radius: 12px; margin-bottom: 6px; transition: all 0.15s; }
+.param-item:hover { transform: translateX(4px); }
+.param-item code { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600; }
+.param-item-system { background: var(--green-light); border: 1px solid var(--green-mid); }
+.param-item-system code { color: var(--green-text); }
+.param-item-custom { background: var(--surface-2); border: 1px solid var(--border); }
+.param-item-custom code { color: var(--text-2); }
+.param-auto-tag { font-size: 8.5px; color: var(--green-text); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 800; background: var(--green-mid); padding: 2px 7px; border-radius: 5px; }
+
+/* ─── FLOW BADGES & META ─── */
+.flow-badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+.patient-name { font-size: 13.5px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+.patient-meta { font-size: 11px; color: var(--text-muted); }
+.last-visit { font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--orange-text); font-weight: 700; }
+
+/* ─── DEMAND GENERATION ─── */
+.generate-btn {
+  display: flex; align-items: center; gap: 10px; padding: 12px 24px; border-radius: 14px; border: none;
+  background: linear-gradient(135deg, var(--purple-deep), var(--purple));
+  color: #fff; font-size: 13.5px; font-weight: 700;
+  cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden;
+  box-shadow: 0 4px 16px rgba(139,92,246,0.25);
+}
+.generate-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(139,92,246,0.35); }
+.generate-btn::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transform: translateX(-100%); transition: transform 0.8s;
+}
+.generate-btn:hover::after { transform: translateX(100%); }
+
+.ai-thinking { display: inline-flex; align-items: center; gap: 4px; }
+.ai-thinking-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--purple); animation: aiDot 1.4s ease-in-out infinite; }
+.ai-thinking-dot:nth-child(2) { animation-delay: 0.2s; }
+.ai-thinking-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes aiDot { 0%,80%,100%{opacity:0.3;transform:scale(0.8)} 40%{opacity:1;transform:scale(1.25)} }
+
+.metric-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
+  padding: 24px; position: relative; overflow: hidden; transition: all 0.3s;
+  box-shadow: var(--shadow-sm);
+}
+.metric-card:hover { transform: translateY(-4px); }
+.metric-card.blue:hover { box-shadow: var(--shadow-glow-blue); }
+.metric-card.orange:hover { box-shadow: 0 0 24px rgba(245,158,11,0.15); }
+.metric-card.red:hover { box-shadow: 0 0 24px rgba(239,68,68,0.15); }
+.metric-card.cyan:hover { box-shadow: 0 0 24px rgba(6,182,212,0.15); }
+.metric-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; border-radius: 20px 20px 0 0; }
+.metric-card.blue::before { background: linear-gradient(90deg, var(--blue-deep), var(--blue)); }
+.metric-card.orange::before { background: linear-gradient(90deg, var(--orange-text), var(--orange)); }
+.metric-card.red::before { background: linear-gradient(90deg, var(--red-text), var(--red)); }
+.metric-card.cyan::before { background: linear-gradient(90deg, var(--cyan-text), var(--cyan)); }
+.metric-label { font-size: 10px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 14px; }
+.metric-val { font-size: 32px; font-weight: 800; line-height: 1; margin-bottom: 8px; letter-spacing: -0.02em; }
+.metric-val.blue { color: var(--blue-text); }
+.metric-val.orange { color: var(--orange-text); }
+.metric-val.red { color: var(--red-text); }
+.metric-val.cyan { color: var(--cyan-text); }
+.metric-delta { font-size: 11.5px; display: flex; align-items: center; gap: 4px; font-weight: 600; }
+.delta-up { color: var(--green-text); }
+.delta-dn { color: var(--orange-text); }
+
+/* ATTRIBUTION CHANNEL ROWS */
+.channel-row { display: flex; align-items: center; gap: 14px; padding: 13px 0; border-bottom: 1px solid var(--border); }
+.channel-row:last-child { border-bottom: none; }
+.channel-name { font-size: 13px; font-weight: 600; color: var(--text); width: 160px; flex-shrink: 0; }
+.channel-bar-wrap { flex: 1; height: 10px; background: var(--surface-3); border-radius: 5px; overflow: hidden; }
+.channel-bar { height: 100%; border-radius: 5px; transition: width 1.5s cubic-bezier(.4,0,.2,1); }
+.channel-count { font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: var(--text-2); width: 45px; text-align: right; flex-shrink: 0; font-weight: 600; }
+.channel-pct { font-size: 12px; font-weight: 800; width: 45px; text-align: right; flex-shrink: 0; }
+
+.narrative-box {
+  --accent1: #8b5cf6; --accent2: #7c3aed; --accent3: #a78bfa;
+  --card-bg: linear-gradient(135deg, var(--purple-light), var(--surface));
+}
+.narrative-header { display: flex; align-items: center; gap: 8px; font-size: 11.5px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--purple-text); margin-bottom: 12px; }
+.narrative-text { font-size: 14px; color: var(--text-2); line-height: 1.8; }
+
+.content-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 14px; background: var(--surface-2); border: 1px solid var(--border); margin-bottom: 8px; transition: all 0.2s; }
+.content-item:hover { border-color: var(--border-2); transform: translateX(3px); }
+.content-type-badge { font-size: 9px; font-weight: 800; padding: 4px 10px; border-radius: 20px; letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap; }
+.type-video { background: var(--blue-light); color: var(--blue-text); border: 1px solid var(--blue-mid); }
+.type-post { background: var(--orange-light); color: var(--orange-text); border: 1px solid var(--orange-mid); }
+.type-carousel { background: var(--purple-light); color: var(--purple-text); border: 1px solid var(--purple-mid); }
+.content-title { font-size: 13px; color: var(--text); flex: 1; font-weight: 500; }
+.content-metric { font-size: 12px; font-weight: 800; color: var(--green-text); }
+
+/* ─── PROMPT SECTIONS ─── */
+.prompt-section { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-sm); }
+.prompt-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid var(--border); background: var(--surface-2); }
+.prompt-title { font-size: 11px; font-weight: 800; color: var(--text-muted); letter-spacing: 0.08em; text-transform: uppercase; }
+.copy-btn { font-size: 11px; font-weight: 700; padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border-2); background: var(--white); color: var(--text-muted); cursor: pointer; transition: all 0.2s; }
+.copy-btn:hover { border-color: var(--blue); color: var(--blue-text); background: var(--blue-light); }
+.copy-btn.copied { border-color: var(--green); color: var(--green-text); background: var(--green-light); }
+.prompt-body { padding: 22px; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; line-height: 1.9; white-space: pre-wrap; max-height: 280px; overflow-y: auto; background: #0c0f17; color: #cbd5e1; border-radius: 0 0 20px 20px; }
+.prompt-body .kw { color: #38bdf8; font-weight: 600; }
+.prompt-body .str { color: #34d399; }
+.prompt-body .cm { color: #64748b; font-style: italic; }
+.prompt-body .id { color: #c4b5fd; }
+.prompt-body .num { color: #fbbf24; }
+
+/* ─── FLOATING TOASTS ─── */
+.toast-container {
+  position: fixed; bottom: 32px; right: 32px; z-index: 1000;
+  display: flex; flex-direction: column; gap: 10px; pointer-events: none;
+}
+.toast {
+  background: var(--surface); border: 2px solid var(--green); color: var(--text);
+  padding: 16px 20px; border-radius: 16px; box-shadow: var(--shadow-lg);
+  font-size: 13.5px; font-weight: 600; display: flex; align-items: center; gap: 10px;
+  transform: translateY(100px); opacity: 0; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  pointer-events: auto;
+}
+.toast.active { transform: translateY(0); opacity: 1; }
+.toast-icon {
+  width: 24px; height: 24px; border-radius: 50%; background: var(--green-light); color: var(--green);
+  display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800;
+}
+
+/* ─── SCROLLBARS ─── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border-3); }
+
+/* ─── PANEL FADE UP ─── */
+@keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.panel.active > * { animation: fadeUp 0.45s cubic-bezier(.22,1,.36,1) forwards; opacity: 0; }
+.panel.active > *:nth-child(1) { animation-delay: 0.03s; }
+.panel.active > *:nth-child(2) { animation-delay: 0.08s; }
+.panel.active > *:nth-child(3) { animation-delay: 0.13s; }
+.panel.active > *:nth-child(4) { animation-delay: 0.18s; }
+.panel.active > *:nth-child(5) { animation-delay: 0.23s; }
+.panel.active > *:nth-child(6) { animation-delay: 0.28s; }
+
+.tooltip { position: relative; }
+.tooltip:hover::after {
+  content: attr(data-tip); position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);
+  background: var(--text); color: var(--white); font-size: 10.5px; padding: 6px 12px; border-radius: 8px;
+  white-space: nowrap; z-index: 100; pointer-events: none; box-shadow: var(--shadow-lg); font-weight: 500;
+}
+
+#callTimer, #outCallTimer { font-family: 'JetBrains Mono', monospace; font-size: 13.5px; color: var(--blue-text); font-weight: 700; }
+[data-theme="dark"] #callTimer { color: var(--blue-text); }
+[data-theme="dark"] #outCallTimer { color: var(--green-text); }
+.spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.6s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="mesh-bg">
+  <div class="glow-orb orb-1"></div>
+  <div class="glow-orb orb-2"></div>
+  <div class="glow-orb orb-3"></div>
+</div>
+<div class="dot-grid"></div>
+
+<div class="shell">
+
+  <!-- ═══ TOPBAR ═══ -->
+  <header class="topbar">
+    <div class="logo">
+      <div class="logo-mark">R</div>
+      <div class="logo-text">Ray<span> AI</span> <span class="logo-sub">· Agent Command Centre</span></div>
+      <div class="ai-wave">
+        <div class="ai-wave-bar"></div>
+        <div class="ai-wave-bar"></div>
+        <div class="ai-wave-bar"></div>
+        <div class="ai-wave-bar"></div>
+        <div class="ai-wave-bar"></div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="theme-btn" id="themeToggleBtn" onclick="toggleTheme()" aria-label="Toggle visual theme">
+        <span class="theme-btn-icon">☀️</span>
+      </button>
+      <div class="env-badge">Production</div>
+      <div class="status-live"><div class="pulse"></div>3 Agents Live</div>
+      <div class="time-badge" id="clockBadge">--:--:--</div>
+    </div>
+  </header>
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <nav class="sidebar">
+    <div class="sidebar-label">AI Agents</div>
+
+    <div class="nav-item active" data-agent="inbound" onclick="switchPanel('inbound',this)">
+      <div class="nav-icon">📞</div>
+      <div class="nav-item-text"><div class="nav-item-title">Apt Booking · Inbound</div><div class="nav-meta">Patient booking calls</div></div>
+      <span class="nav-badge badge-blue">Live</span>
+    </div>
+    <div class="nav-item" data-agent="outbound" onclick="switchPanel('outbound',this)">
+      <div class="nav-icon">📤</div>
+      <div class="nav-item-text"><div class="nav-item-title">Post OPD · Outbound</div><div class="nav-meta">Post-consultation calls</div></div>
+      <span class="nav-badge badge-green">8%</span>
+    </div>
+    <div class="nav-item" data-agent="demand" onclick="switchPanel('demand',this)">
+      <div class="nav-icon">📊</div>
+      <div class="nav-item-text"><div class="nav-item-title">Demand Gen · Report</div><div class="nav-meta">Monthly growth metrics</div></div>
+      <span class="nav-badge badge-purple">May</span>
+    </div>
+
+    <div class="sidebar-label">Platform</div>
+    <div class="sidebar-section">
+      <div class="env-card"><div class="env-card-label">RingAI Base URL</div><div class="env-card-val">prod-api.ringg.ai</div></div>
+      <div class="env-card"><div class="env-card-label">API Documentation</div><div class="env-card-val" style="color:var(--blue-text); font-weight:600">docs.ringg.ai</div></div>
+      <div class="env-card"><div class="env-card-label">AI Pipeline</div><div class="env-card-val">Claude SDK · Anthropic</div></div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="sf-label">Powered By</div>
+      <div class="sf-id">Ray AI · Practo · RingAI · Claude SDK</div>
+    </div>
+  </nav>
+
+  <!-- ═══ MAIN CONTENT ═══ -->
+  <main class="main">
+
+    <!-- ══════════════ PANEL 1 · INBOUND ══════════════ -->
+    <div class="panel active" id="panel-inbound">
+      <div class="page-header">
+        <div class="page-title-group">
+          <div class="page-eyebrow" style="color:var(--blue-text)"><span class="eyebrow-dot" style="background:var(--blue);color:var(--blue)"></span>Agent 1 · Inbound · Apt Booking</div>
+          <div class="page-title">Patient Call Trigger</div>
+          <div class="page-sub">Enter a patient number to trigger the Inbound Appointment Booking agent. Handles incoming booking queries and scheduling.</div>
+          <div class="agent-id-chip tooltip" data-tip="Click to copy Agent ID" onclick="copyText('TBD - Credentials Shared Later',this)">🔑 <span>TBD - Credentials Shared Later</span></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
+          <div class="call-status-card"><span style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted)">Status</span><span id="callStatusLabel" style="font-size:12.5px;font-weight:800;color:var(--text-muted)">Idle</span></div>
+          <div id="callTimerWrap" style="display:none;font-size:12px;text-align:right;font-weight:600">⏱ <span id="callTimer">00:00</span></div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="glow-card dial-card">
+          <div class="glow-card-inner">
+            <div class="dial-label dial-label-blue">📞 Trigger Inbound Call via RingAI Webhook</div>
+            <div class="phone-input-wrap">
+              <div class="country-code cc-blue">+91</div>
+              <input class="phone-input" id="phoneInput" type="tel" maxlength="10" placeholder="98765 43210" oninput="formatPhone(this)" autocomplete="off"/>
+            </div>
+            <button class="trigger-btn btn-blue" id="triggerBtn" onclick="triggerCall()">
+              <span id="triggerBtnIcon">📞</span>
+              <span id="triggerBtnText">Trigger Inbound Agent</span>
+            </button>
+            <div class="webhook-note"><span>ℹ️</span><span>Fires <code class="code-blue">call_started</code> → <code class="code-blue">call_completed</code> → <code class="code-blue">recording_completed</code> → <code class="code-blue">all_processing_completed</code> on <code class="code-blue">POST /webhooks/ringai/inbound</code></span></div>
+          </div>
+        </div>
+
+        <!-- LIVE AUDIO WAVE & CHAT SIMULATOR CARD -->
+        <div class="card" style="display: flex; flex-direction: column; gap: 12px;">
+          <div class="card-title" style="margin-bottom:0"><span class="card-title-dot" style="background:var(--blue)"></span>Ray AI · Speech Transcript & Waveform</div>
+          
+          <div class="waveform-container" id="inboundWaveform">
+            <div class="waveform-label">AI Voice Stream</div>
+            <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+            <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+            <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+            <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+            <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+            <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+            <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+          </div>
+
+          <div class="chat-window" id="inboundChatWindow">
+            <div class="chat-placeholder" id="inboundChatPlaceholder">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" /></svg>
+              <span>Waiting to initiate call simulation...<br><small style="opacity: 0.7">Trigger a call to see live transcript.</small></span>
+            </div>
+            <div class="chat-bubble typing-bubble" id="inboundTypingBubble" style="display:none; align-self: flex-start; background: var(--surface);">
+              <span class="sender" style="color:var(--blue); font-weight:800; font-size:9.5px; text-transform:uppercase; margin-bottom:4px; display:block">Ray AI</span>
+              <div class="typing-indicator"><span></span><span></span><span></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title"><span class="card-title-dot" style="background:var(--blue)"></span>Webhook Event Timeline</div>
+          <div class="event-log" id="eventLog">
+            <div class="event-row"><div class="event-dot muted"></div><span class="event-name">call_started</span><span class="event-time">--:--</span><span class="event-status" style="background:var(--surface-3);color:var(--text-muted)">waiting</span></div>
+            <div class="event-row"><div class="event-dot muted"></div><span class="event-name">call_completed</span><span class="event-time">--:--</span><span class="event-status" style="background:var(--surface-3);color:var(--text-muted)">waiting</span></div>
+            <div class="event-row"><div class="event-dot muted"></div><span class="event-name">recording_completed</span><span class="event-time">--:--</span><span class="event-status" style="background:var(--surface-3);color:var(--text-muted)">waiting</span></div>
+            <div class="event-row"><div class="event-dot muted"></div><span class="event-name">all_processing_completed</span><span class="event-time">--:--</span><span class="event-status" style="background:var(--surface-3);color:var(--text-muted)">waiting</span></div>
+          </div>
+        </div>
+        
+        <!-- LIVE WEBHOOK PAYLOAD DEBUGGER -->
+        <div class="card debugger-card">
+          <div class="debugger-header">
+            <div class="debugger-title"><div class="debugger-dot" id="inboundDebuggerDot"></div>Claude API Webhook Receiver Logger</div>
+            <span style="font-size:9.5px; color:#64748b; font-weight:700; font-family:'JetBrains Mono'">STATUS: IDLE</span>
+          </div>
+          <div class="debugger-body" id="inboundDebuggerBody">Waiting for RingAI webhook events to stream payload logging...</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title"><span class="card-title-dot" style="background:var(--blue)"></span>Today · Inbound Stats</div>
+          <div class="stats-mini-grid">
+            <div class="stats-mini-item"><div class="stats-mini-val" style="color:var(--blue)" id="statInCalls">18</div><div class="stats-mini-label">Calls Received</div></div>
+            <div class="stats-mini-item"><div class="stats-mini-val" style="color:var(--green)" id="statInResponded">14</div><div class="stats-mini-label">Responded</div></div>
+            <div class="stats-mini-item"><div class="stats-mini-val" style="color:var(--purple)" id="statInBooked">9</div><div class="stats-mini-label">Booked</div></div>
+            <div class="stats-mini-item"><div class="stats-mini-val" style="color:var(--orange)" id="statInPending">2</div><div class="stats-mini-label">Pending</div></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><span class="card-title-dot" style="background:var(--blue)"></span>Recent Inbound Calls</div>
+          <div class="table-wrap">
+            <table class="data-table" id="inboundCallsTable">
+              <thead><tr><th>Patient Number</th><th>Time</th><th>Duration</th><th>Classification</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td><span class="phone-mono">+91 98765 43210</span></td><td>5:22 PM</td><td>3m 14s</td><td>appointment_booked</td><td><span class="pill pill-booked">Booked</span></td></tr>
+                <tr><td><span class="phone-mono">+91 91234 56789</span></td><td>4:47 PM</td><td>1m 52s</td><td>query_resolved</td><td><span class="pill pill-booked">Done</span></td></tr>
+                <tr><td><span class="phone-mono">+91 88001 23456</span></td><td>4:11 PM</td><td>—</td><td>incomplete_call</td><td><span class="pill pill-pending">Pending</span></td></tr>
+                <tr><td><span class="phone-mono">+91 77889 01234</span></td><td>3:38 PM</td><td>2m 06s</td><td>feedback_collected</td><td><span class="pill pill-booked">Done</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="prompt-section">
+        <div class="prompt-header"><div class="prompt-title">Build Prompt · Inbound Appointment Booking Agent</div><button class="copy-btn" onclick="copyPromptBlock('inboundPrompt',this)">⎘ Copy</button></div>
+        <div class="prompt-body" id="inboundPrompt"><span class="cm"># Agent 1 — Inbound Appointment Booking Agent</span>
+<span class="cm">## Identity</span>
+<span class="kw">Agent ID:</span>  <span class="id">TBD - Credentials Shared Later</span>
+<span class="kw">Webhook:</span>   <span class="str">POST /webhooks/ringai/inbound</span>
+<span class="kw">Events:</span>    <span class="str">call_started → call_completed → recording_completed → all_processing_completed</span>
+
+<span class="cm">## Trigger</span>
+Patient calls the clinic number to book an appointment.
+RingAI receives inbound → fires call_started → AI conversation → all_processing_completed.
+
+<span class="cm">## Webhook Receiver</span>
+<span class="num">1.</span> Validate Authorization header → reject 401 if invalid
+<span class="num">2.</span> Return 204 IMMEDIATELY (never block the webhook)
+<span class="num">3.</span> Dedup key: call_id + event_type
+<span class="num">4.</span> On all_processing_completed → run Claude pipeline
+
+<span class="cm">## Claude Pipeline</span>
+Parse transcript → extract: intent, preferred_date, preferred_time, doctor_specialty
+→ Call Booking API → confirm appointment → Send WhatsApp confirmation
+
+<span class="cm">## Classifications</span>
+appointment_booked | query_resolved | incomplete_call | callback_requested | feedback_collected</div>
+      </div>
+    </div>
+
+
+    <!-- ══════════════ PANEL 2 · OUTBOUND ══════════════ -->
+    <div class="panel" id="panel-outbound">
+      <div class="page-header">
+        <div class="page-title-group">
+          <div class="page-eyebrow" style="color:var(--green-text)"><span class="eyebrow-dot" style="background:var(--green);color:var(--green)"></span>Agent 2 · Outbound · Post OPD Follow-Up</div>
+          <div class="page-title">Post OPD Dialler</div>
+          <div class="page-sub">Patients with a recent OPD consultation are called from the verified number below. Ray asks about their recovery, notes advice, and schedules recommended follow-ups.</div>
+          <div class="agent-id-chip tooltip" data-tip="Click to copy Agent ID" onclick="copyText('35b9bb7d-c4ea-45eb-95c6-cc31f83e008f',this)">🔑 <span>35b9bb7d-c4ea-45eb-95c6-cc31f83e008f</span></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
+          <div class="call-status-card"><span style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted)">Status</span><span id="outCallStatusLabel" style="font-size:12.5px;font-weight:800;color:var(--text-muted)">Idle</span></div>
+          <div id="outCallTimerWrap" style="display:none;font-size:12px;text-align:right;font-weight:600">⏱ <span id="outCallTimer">00:00</span></div>
+        </div>
+      </div>
+
+      <!-- OUTBOUND TRIGGER CARD -->
+      <div class="grid-2">
+        <div class="glow-card dial-card-green">
+          <div class="glow-card-inner">
+            <div class="dial-label dial-label-green">📤 Trigger Outbound Post OPD Call</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:4px">
+              <div>
+                <label class="input-label">Patient Name</label>
+                <input class="text-input" id="outPatientName" type="text" placeholder="Anjali Sharma" autocomplete="off"/>
+              </div>
+              <div>
+                <label class="input-label">Patient Phone Number</label>
+                <div class="phone-input-wrap" style="margin-bottom:0">
+                  <div class="country-code cc-green">+91</div>
+                  <input class="phone-input green-focus" id="outPhoneInput" type="tel" maxlength="10" placeholder="98765 43210" oninput="formatPhone(this)" autocomplete="off" style="font-size:15px;padding:12px 14px"/>
+                </div>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+              <div>
+                <label class="input-label">Doctor Name</label>
+                <input class="text-input" id="outDoctorName" type="text" placeholder="Dr. Mehra" autocomplete="off" style="margin-bottom:0"/>
+              </div>
+              <div>
+                <label class="input-label">Specialty</label>
+                <input class="text-input" id="outSpecialty" type="text" placeholder="Dermatology" autocomplete="off" style="margin-bottom:0"/>
+              </div>
+            </div>
+            <button class="trigger-btn btn-green" id="outTriggerBtn" onclick="triggerOutboundCall()">
+              <span id="outTriggerIcon">📤</span>
+              <span id="outTriggerText">Trigger Outbound Agent</span>
+            </button>
+            <div class="webhook-note"><span>ℹ️</span><span>Calls from <code class="code-green">+912268095634</code> using <code class="code-green">from_number_id: ffc7dd03…</code> → webhook events on <code class="code-green">POST /webhooks/ringai/outbound</code></span></div>
+          </div>
+        </div>
+
+        <!-- LIVE AUDIO WAVE & CHAT SIMULATOR CARD FOR OUTBOUND -->
+        <div class="card" style="display: flex; flex-direction: column; gap: 12px;">
+          <div class="card-title" style="margin-bottom:0"><span class="card-title-dot" style="background:var(--green)"></span>Ray AI · Speech Transcript & Waveform</div>
+          
+          <div class="waveform-container green" id="outboundWaveform">
+            <div class="waveform-label">AI Voice Stream</div>
+            <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+            <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+            <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+            <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+            <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+            <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+            <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+          </div>
+
+          <div class="chat-window" id="outboundChatWindow">
+            <div class="chat-placeholder" id="outboundChatPlaceholder">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" /></svg>
+              <span>Waiting to initiate call simulation...<br><small style="opacity: 0.7">Trigger a call to see live transcript.</small></span>
+            </div>
+            <div class="chat-bubble typing-bubble" id="outboundTypingBubble" style="display:none; align-self: flex-start; background: var(--surface);">
+              <span class="sender" style="color:var(--green); font-weight:800; font-size:9.5px; text-transform:uppercase; margin-bottom:4px; display:block">Ray AI</span>
+              <div class="typing-indicator"><span></span><span></span><span></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TIMELINES + LOGGERS -->
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title"><span class="card-title-dot" style="background:var(--green)"></span>Webhook Event Timeline</div>
+          <div class="event-log" id="outEventLog">
+            <div class="event-row"><div class="event-dot muted"></div><span class="event-name">call_initiated</span><span class="event-time">--:--</span><span class="event-status" style="background:var(--surface-3);color:var(--text-muted)">waiting</span></div>
+            <div class="event-row"><div class="event-dot muted"></div><span class="event-name">call_started</span><span class="event-time">--:--</span><span class="event-status" style="background:var(--surface-3);color:var(--text-muted)">waiting</span></div>
+            <div class="event-row"><div class="event-dot muted"></div><span class="event-name">call_completed</span><span class="event-time">--:--</span><span class="event-status" style="background:var(--surface-3);color:var(--text-muted)">waiting</span></div>
+            <div class="event-row"><div class="event-dot muted"></div><span class="event-name">all_processing_completed</span><span class="event-time">--:--</span><span class="event-status" style="background:var(--surface-3);color:var(--text-muted)">waiting</span></div>
+          </div>
+        </div>
+        
+        <!-- OUTBOUND WEBHOOK PAYLOAD DEBUGGER -->
+        <div class="card debugger-card">
+          <div class="debugger-header">
+            <div class="debugger-title"><div class="debugger-dot" id="outboundDebuggerDot"></div>Claude API Webhook Receiver Logger</div>
+            <span style="font-size:9.5px; color:#64748b; font-weight:700; font-family:'JetBrains Mono'">STATUS: IDLE</span>
+          </div>
+          <div class="debugger-body" id="outboundDebuggerBody">Waiting for RingAI webhook events to stream payload logging...</div>
+        </div>
+      </div>
+
+      <!-- FROM NUMBER + STATS -->
+      <div class="grid-2">
+        <div class="glow-card from-number-hero">
+          <div class="glow-card-inner" style="display:flex;align-items:center;gap:20px">
+            <div class="from-icon">📲</div>
+            <div>
+              <div class="from-label">Calling From</div>
+              <div class="from-number-text">+91 22 6809 5634</div>
+              <div class="from-sub">Verified outbound number</div>
+              <div class="from-id-row">
+                <div class="from-id-chip">ID: <span>ffc7dd03…ad36</span></div>
+                <div class="from-id-chip tooltip" data-tip="Copy Verified Caller ID" onclick="copyText('ffc7dd03-3a4d-46ef-9aab-5aba0699ad36',this)" style="cursor:pointer;color:var(--green-text);font-weight:600">⎘ Copy</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="stat-chip"><div class="stat-val" style="color:var(--blue)">1,240</div><div class="stat-label">OPD Consults</div><div class="stat-delta" style="color:var(--text-muted)">Recent</div></div>
+          <div class="stat-chip"><div class="stat-val" style="color:var(--green)" id="statReactivated">142</div><div class="stat-label">Followed Up</div><div class="stat-delta" style="color:var(--green)" id="statReactivatedDelta">↑ 11.4%</div></div>
+          <div class="stat-chip"><div class="stat-val" style="color:var(--purple)" id="statOutBooked">68</div><div class="stat-label">Booked</div><div class="stat-delta" style="color:var(--green)">+15–25%</div></div>
+          <div class="stat-chip"><div class="stat-val" style="color:var(--orange)">100%</div><div class="stat-label">Consent</div><div class="stat-delta" style="color:var(--text-muted)">Opt-out ✓</div></div>
+        </div>
+      </div>
+
+      <!-- PARAMS + QUEUE -->
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title"><span class="card-title-dot" style="background:var(--green)"></span>Input Parameters · Per Call</div>
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <div class="param-group-label"><span class="param-dot" style="background:var(--green)"></span>System · Auto-injected</div>
+            <div class="param-item param-item-system"><code>callee_name</code><span class="param-auto-tag">auto</span></div>
+            <div class="param-item param-item-system"><code>mobile_number</code><span class="param-auto-tag">auto</span></div>
+            <div class="param-group-label" style="margin-top:10px"><span class="param-dot" style="background:var(--border-3)"></span>Custom · Passed on Initiate</div>
+            <div class="param-item param-item-custom"><code>patient_id</code></div>
+            <div class="param-item param-item-custom"><code>patient_name</code></div>
+            <div class="param-item param-item-custom"><code>doctor_name</code></div>
+            <div class="param-item param-item-custom"><code>doctor_specialty</code></div>
+            <div class="param-item param-item-custom"><code>appointment_date</code></div>
+            <div class="param-item param-item-custom"><code>appointment_time</code></div>
+            <div class="param-item param-item-custom"><code>scheduler_appointment_id</code></div>
+            <div class="param-item param-item-custom"><code>appointment_id</code></div>
+            <div class="param-item param-item-custom"><code>doctor_reference_id</code></div>
+            <div class="param-item param-item-custom"><code>practice_reference_id</code></div>
+            <div class="param-item param-item-custom"><code>doctor_id</code></div>
+            <div class="param-item param-item-custom"><code>practice_id</code></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title"><span class="card-title-dot" style="background:var(--green)"></span>Post OPD Follow-Up Queue · This Month</div>
+          <div class="table-wrap">
+            <table class="data-table" id="outboundQueueTable">
+              <thead><tr><th>Patient</th><th>Consult Date</th><th>Cohort</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr id="row-Anjali-Sharma"><td><div class="patient-name">Anjali Sharma</div><div class="patient-meta">Post-PRP</div></td><td><span class="last-visit">Yesterday</span></td><td><span class="flow-badge" style="background:var(--purple-light);color:var(--purple-text);border:1px solid var(--purple-mid)">PRP Review</span></td><td><span class="pill pill-booked" id="status-Anjali-Sharma">Booked</span></td></tr>
+                <tr id="row-Ramesh-Iyer"><td><div class="patient-name">Ramesh Iyer</div><div class="patient-meta">Hair transplant</div></td><td><span class="last-visit">2 days ago</span></td><td><span class="flow-badge" style="background:var(--blue-light);color:var(--blue-text);border:1px solid var(--blue-mid)">Hair Review</span></td><td><span class="pill pill-called" id="status-Ramesh-Iyer">Called</span></td></tr>
+                <tr id="row-Priya-Mehrotra"><td><div class="patient-name">Priya Mehrotra</div><div class="patient-meta">Acne</div></td><td><span class="last-visit">2 days ago</span></td><td><span class="flow-badge" style="background:var(--orange-light);color:var(--orange-text);border:1px solid var(--orange-mid)">Acne Follow-up</span></td><td><span class="pill pill-pending" id="status-Priya-Mehrotra">Queued</span></td></tr>
+                <tr id="row-Sneha-Joshi"><td><div class="patient-name">Sneha Joshi</div><div class="patient-meta">PRP session</div></td><td><span class="last-visit">3 days ago</span></td><td><span class="flow-badge" style="background:var(--purple-light);color:var(--purple-text);border:1px solid var(--purple-mid)">PRP Review</span></td><td><span class="pill pill-pending" id="status-Sneha-Joshi">Queued</span></td></tr>
+                <tr id="row-Rohit-Kumar"><td><div class="patient-name">Rohit Kumar</div><div class="patient-meta">Post-transplant</div></td><td><span class="last-visit">3 days ago</span></td><td><span class="flow-badge" style="background:var(--blue-light);color:var(--blue-text);border:1px solid var(--blue-mid)">Hair Review</span></td><td><span class="pill pill-voicemail" id="status-Rohit-Kumar">Voicemail</span></td></tr>
+                <tr id="row-Kavita-Desai"><td><div class="patient-name">Kavita Desai</div><div class="patient-meta">Skin care</div></td><td><span class="last-visit">Yesterday</span></td><td><span class="flow-badge" style="background:var(--green-light);color:var(--green-text);border:1px solid var(--green-mid)">Skin Follow-up</span></td><td><span class="pill pill-booked" id="status-Kavita-Desai">Booked</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="prompt-section">
+        <div class="prompt-header"><div class="prompt-title">Build Prompt · Outbound Post OPD Agent</div><button class="copy-btn" onclick="copyPromptBlock('outboundPrompt',this)">⎘ Copy</button></div>
+        <div class="prompt-body" id="outboundPrompt"><span class="cm"># Agent 2 — Outbound Post OPD Follow-Up Agent</span>
+<span class="cm">## Identity</span>
+<span class="kw">Agent ID:</span>        <span class="id">35b9bb7d-c4ea-45eb-95c6-cc31f83e008f</span>
+<span class="kw">From Number:</span>     <span class="str">+912268095634</span>
+<span class="kw">From Number ID:</span>  <span class="id">ffc7dd03-3a4d-46ef-9aab-5aba0699ad36</span>
+<span class="kw">Webhook:</span>         <span class="str">POST /webhooks/ringai/outbound</span>
+<span class="kw">Events:</span>          <span class="str">call_started, call_completed, all_processing_completed</span>
+
+<span class="cm">## Goal</span>
+Follow up with recent OPD patients. Target: <span class="num">85%+</span> review completion rate.
+
+<span class="cm">## Initiate Call</span>
+from_number_id: <span class="str">"ffc7dd03-3a4d-46ef-9aab-5aba0699ad36"</span>
+to_number: patient mobile (E.164)
+custom_args_values: { <span class="id">patient_id, patient_name, doctor_name, doctor_specialty,
+  appointment_date, appointment_time, scheduler_appointment_id,
+  appointment_id, doctor_reference_id, practice_reference_id,
+  doctor_id, practice_id</span> }
+
+<span class="cm">## Webhook Handling</span>
+call_started → mark active | call_completed → check status
+all_processing_completed → Claude: <span class="str">booked / interested / voicemail / not_interested</span>
+VOICEMAIL → retry max <span class="num">3</span> | callback → flag human agent</div>
+      </div>
+    </div>
+
+
+    <!-- ══════════════ PANEL 3 · DEMAND GEN ══════════════ -->
+    <div class="panel" id="panel-demand">
+      <div class="page-header">
+        <div class="page-title-group">
+          <div class="page-eyebrow" style="color:var(--purple-text)"><span class="eyebrow-dot" style="background:var(--purple);color:var(--purple)"></span>Agent 3 · Demand Generation</div>
+          <div class="page-title">Monthly Growth Report</div>
+          <div class="page-sub">4 APIs → Claude analysis → AI-generated metrics &amp; narrative. Auto-sent on 1st of every month.</div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:center">
+          <div style="text-align:right"><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;font-weight:800">Report Period</div><div style="font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--text);font-weight:700">May 2026</div></div>
+          <button class="generate-btn" id="generateBtn" onclick="generateReport()"><span id="genIcon">✨</span><span id="genText">Generate with Claude</span></button>
+        </div>
+      </div>
+
+      <div class="grid-4">
+        <div class="metric-card blue"><div class="metric-label">New Bookings</div><div class="metric-val blue" id="m1">47</div><div class="metric-delta delta-up">↑ 38% vs last month</div></div>
+        <div class="metric-card orange"><div class="metric-label">Spend This Month</div><div class="metric-val orange" id="m2">₹19,400</div><div class="metric-delta delta-dn">↓ 22% vs last month</div></div>
+        <div class="metric-card red"><div class="metric-label">Cost Per Lead</div><div class="metric-val red" id="m3">₹290</div><div class="metric-delta delta-up">↓ ₹130 saved</div></div>
+        <div class="metric-card cyan"><div class="metric-label">Return on Spend</div><div class="metric-val cyan" id="m4">2.4×</div><div class="metric-delta delta-up">↑ 0.7× vs last month</div></div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title"><span class="card-title-dot" style="background:var(--purple)"></span>5 Channels · Booking Attribution</div>
+          <div id="channelBars">
+            <div class="channel-row"><div class="channel-name">📋 Practo Listing</div><div class="channel-bar-wrap"><div class="channel-bar" style="width:0%;background:linear-gradient(90deg,#2563eb,#3b82f6)" data-w="47%"></div></div><div class="channel-count">22</div><div class="channel-pct" style="color:var(--blue-text)">47%</div></div>
+            <div class="channel-row"><div class="channel-name">📍 Google Business</div><div class="channel-bar-wrap"><div class="channel-bar" style="width:0%;background:linear-gradient(90deg,#d97706,#f59e0b)" data-w="30%"></div></div><div class="channel-count">14</div><div class="channel-pct" style="color:var(--orange-text)">30%</div></div>
+            <div class="channel-row"><div class="channel-name">🎯 Meta + Google Ads</div><div class="channel-bar-wrap"><div class="channel-bar" style="width:0%;background:linear-gradient(90deg,#7c3aed,#8b5cf6)" data-w="15%"></div></div><div class="channel-count">7</div><div class="channel-pct" style="color:var(--purple-text)">15%</div></div>
+            <div class="channel-row"><div class="channel-name">🎬 Video Shorts</div><div class="channel-bar-wrap"><div class="channel-bar" style="width:0%;background:linear-gradient(90deg,#0891b2,#06b6d4)" data-w="6%"></div></div><div class="channel-count">3</div><div class="channel-pct" style="color:var(--cyan-text)">6%</div></div>
+            <div class="channel-row"><div class="channel-name">💬 WhatsApp</div><div class="channel-bar-wrap"><div class="channel-bar" style="width:0%;background:linear-gradient(90deg,#059669,#10b981)" data-w="2%"></div></div><div class="channel-count">1</div><div class="channel-pct" style="color:var(--green-text)">2%</div></div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div class="glow-card narrative-box">
+            <div class="glow-card-inner">
+              <div class="narrative-header">✨ Claude AI Narrative</div>
+              <div class="narrative-text" id="narrativeText">Practo and Google Business drove 77% of bookings this month while ad spend dropped 22% — meaning every rupee worked harder. Video Shorts is your fastest-growing channel at 4.2K views per clip; doubling content output here could shift 10–15 more bookings per month at near-zero marginal cost.</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title"><span class="card-title-dot" style="background:var(--purple)"></span>Content Published</div>
+            <div>
+              <div class="content-item"><span class="content-type-badge type-video">Video · 32s</span><span class="content-title">"3 things to know before PRP"</span><span class="content-metric">4.2K views</span></div>
+              <div class="content-item"><span class="content-type-badge type-post">Google Post</span><span class="content-title">"PRP vs mesotherapy outcomes"</span><span class="content-metric">78 saves</span></div>
+              <div class="content-item"><span class="content-type-badge type-carousel">Carousel</span><span class="content-title">"Anjali's transplant journey"</span><span class="content-metric">CTR +34%</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="prompt-section">
+        <div class="prompt-header"><div class="prompt-title">Build Prompt · Demand Generation Agent</div><button class="copy-btn" onclick="copyPromptBlock('demandPrompt',this)">⎘ Copy</button></div>
+        <div class="prompt-body" id="demandPrompt"><span class="cm"># Agent 3 — Demand Generation · Monthly Growth Report</span>
+<span class="cm">## Identity</span>
+No RingAI agent. Internal service. Runs: <span class="str">1st of every month</span> (cron) + on-demand.
+
+<span class="cm">## Data Sources</span>
+<span class="num">1.</span> bookingsApi → count + source | <span class="num">2.</span> spendApi → by channel
+<span class="num">3.</span> channelApi → attribution | <span class="num">4.</span> contentApi → posts, views, CTR
+
+<span class="cm">## Claude SDK</span>
+Return JSON: { new_bookings, spend, cost_per_lead, return_on_spend,
+  channels: [{ name, bookings, pct }],
+  content_published: [{ type, title, metric }],
+  narrative: <span class="str">string</span> }
+
+<span class="cm">## Delivery</span>
+Auto-send 1st of month: email + PDF. On-demand: dashboard generate button.</div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ═══ TOAST NOTIFICATION WRAPPER ═══ -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+// ── CLOCK ──
+function updateClock(){document.getElementById('clockBadge').textContent=new Date().toLocaleTimeString('en-IN',{hour12:false,hour:'2-digit',minute:'2-digit',second:'2-digit'})}
+setInterval(updateClock,1000);updateClock();
+
+// ── THEME SWITCH ──
+function toggleTheme(){
+  const html = document.documentElement;
+  const current = html.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  
+  const icon = document.querySelector('#themeToggleBtn .theme-btn-icon');
+  if (icon) {
+    icon.style.transform = 'rotate(360deg) scale(0)';
+    setTimeout(() => {
+      icon.textContent = next === 'dark' ? '☀️' : '🌙';
+      icon.style.transform = 'rotate(720deg) scale(1)';
+    }, 250);
+  }
+  localStorage.setItem('ray-theme', next);
+}
+
+// Auto-initialize theme on page load from localStorage
+const savedTheme = localStorage.getItem('ray-theme') || 'light';
+document.documentElement.setAttribute('data-theme', savedTheme);
+window.addEventListener('DOMContentLoaded', () => {
+  const initialIcon = document.querySelector('#themeToggleBtn .theme-btn-icon');
+  if (initialIcon) {
+    initialIcon.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+  }
+});
+
+// ── PANEL SWITCH ──
+function switchPanel(id,el){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  el.classList.add('active');
+  if(id==='demand')setTimeout(animateBars,250);
+}
+
+// ── PHONE FORMAT ──
+function formatPhone(el){el.value=el.value.replace(/\D/g,'').slice(0,10)}
+
+// ── FLOATING TOAST SYSTEM ──
+function showToast(message) {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.innerHTML = `<div class="toast-icon">✓</div><div>${message}</div>`;
+  container.appendChild(toast);
+  
+  setTimeout(() => toast.classList.add('active'), 50);
+  setTimeout(() => {
+    toast.classList.remove('active');
+    setTimeout(() => toast.remove(), 400);
+  }, 4000);
+}
+
+let callInterval=null,callSec=0;
+let inboundChatIndex = 0;
+
+function resetTimeline(logId) {
+  const log = document.getElementById(logId);
+  if (!log) return;
+  Array.from(log.children).forEach(row => {
+    const dot = row.querySelector('.event-dot');
+    if (dot) dot.className = 'event-dot muted';
+    const name = row.querySelector('.event-name');
+    if (name) name.style.color = '';
+    const time = row.querySelector('.event-time');
+    if (time) time.textContent = '--:--';
+    const status = row.querySelector('.event-status');
+    if (status) {
+      status.textContent = 'waiting';
+      status.style.background = '';
+      status.style.color = '';
+    }
+  });
+}
+
+function triggerCall(){
+  const phoneInputEl = document.getElementById('phoneInput');
+  const phone=phoneInputEl.value.replace(/\D/g,'');
+  if(phone.length<10){shake(phoneInputEl);return}
+
+  const btn=document.getElementById('triggerBtn'),icon=document.getElementById('triggerBtnIcon'),txt=document.getElementById('triggerBtnText');
+  const wave = document.getElementById('inboundWaveform');
+  const chatWin = document.getElementById('inboundChatWindow');
+  const chatPlaceholder = document.getElementById('inboundChatPlaceholder');
+  const typing = document.getElementById('inboundTypingBubble');
+  const debug = document.getElementById('inboundDebuggerBody');
+  const dbDot = document.getElementById('inboundDebuggerDot');
+  
+  btn.classList.add('loading');
+  btn.style.pointerEvents = 'none';
+  icon.innerHTML='<div class="spinner"></div>';
+  txt.textContent='Connecting via RingAI API…';
+  
+  // Reset logs and timeline
+  chatPlaceholder.style.opacity = '0';
+  document.querySelectorAll('#inboundChatWindow .chat-bubble:not(.typing-bubble)').forEach(el => el.remove());
+  resetTimeline('eventLog');
+  setCallStatus('callStatusLabel','Connecting...','var(--orange-text)');
+  dbDot.className = 'debugger-dot active';
+  dbDot.parentNode.nextElementSibling.textContent = 'STATUS: ACTIVE';
+  debug.innerHTML = '<span style="color:#64748b">// Dispatching webhook calling events...\n</span>';
+
+  // Event timelines delays
+  setTimeout(() => {
+    fireEvent('call_started', 'blue', 'live', 'blue');
+    setCallStatus('callStatusLabel','Ringing','var(--orange-text)');
+    txt.textContent='Ringing patient...';
+    debug.innerHTML += `<span style="color:#38bdf8">[WEBHOOK - ${new Date().toLocaleTimeString()}]</span> event: <span style="color:#fbbf24">call_started</span> | call_id: <span style="color:#a78bfa">cl_981a8c3e</span>\n`;
+  }, 1000);
+
+  setTimeout(() => {
+    setCallStatus('callStatusLabel','Connected','var(--blue-text)');
+    document.getElementById('callTimerWrap').style.display='block';
+    startTimer('callTimer');
+    wave.classList.remove('active'); // Start breathing, not active dance
+    btn.classList.remove('loading');
+    icon.textContent='✓';
+    txt.textContent='Call Simulator Active';
+    debug.innerHTML += `<span style="color:#38bdf8">[WEBHOOK - ${new Date().toLocaleTimeString()}]</span> event: <span style="color:#fbbf24">call_connected</span> | sub_status: <span style="color:#34d399">ACCEPTED</span>\n`;
+    
+    // Begin Transcript Script Sequence
+    inboundChatIndex = 0;
+    runInboundChatLoop(phone);
+  }, 2200);
+}
+
+const inboundDialogue = [
+  { sender: 'ai', text: "Hi! Thank you for calling Dr. Mehra's clinic. This is Ray, your AI healthcare assistant. How can I help you today?" },
+  { sender: 'patient', text: "Hello, I wanted to schedule an appointment with Dr. Mehra for some skin issues." },
+  { sender: 'ai', text: "I can absolutely help you with that. Dr. Mehra is available this coming Saturday, May 23rd. We have slots open at 10:30 AM, 2:00 PM, and 4:15 PM. Do any of these work for you?" },
+  { sender: 'patient', text: "Saturday at 10:30 AM works great for me." },
+  { sender: 'ai', text: "Perfect! I've reserved that slot for you. Calling our Dhanvantri booking engine now... Confirmed! Saturday, May 23rd at 10:30 AM with Dr. Mehra. A confirmation WhatsApp is on its way." },
+  { sender: 'patient', text: "Awesome. Thank you so much!" },
+  { sender: 'ai', text: "You're very welcome! Feel free to call us back anytime. Have a healthy day!" }
+];
+
+function runInboundChatLoop(phone) {
+  const chatWin = document.getElementById('inboundChatWindow');
+  const typing = document.getElementById('inboundTypingBubble');
+  const debug = document.getElementById('inboundDebuggerBody');
+  const wave = document.getElementById('inboundWaveform');
+
+  if (inboundChatIndex >= inboundDialogue.length) {
+    // End the call simulation
+    setTimeout(() => {
+      stopTimer();
+      setCallStatus('callStatusLabel','Completed','var(--green-text)');
+      document.getElementById('callTimerWrap').style.display='none';
+      wave.classList.remove('active');
+      
+      const btn=document.getElementById('triggerBtn'),icon=document.getElementById('triggerBtnIcon'),txt=document.getElementById('triggerBtnText');
+      btn.style.pointerEvents = 'auto';
+      icon.textContent='📞';
+      txt.textContent='Trigger Inbound Agent';
+
+      // Finish webhook timeline
+      fireEvent('call_completed', 'green', 'done', 'green');
+      fireEvent('recording_completed', 'orange', 'uploaded', 'blue');
+      
+      debug.innerHTML += `<span style="color:#38bdf8">[WEBHOOK - ${new Date().toLocaleTimeString()}]</span> event: <span style="color:#fbbf24">call_completed</span> | duration: <span style="color:#34d399">75s</span>\n`;
+      debug.innerHTML += `<span style="color:#38bdf8">[WEBHOOK - ${new Date().toLocaleTimeString()}]</span> event: <span style="color:#fbbf24">recording_completed</span> | url: <span style="color:#34d399">https://records.ringg.ai/cl_981a8c3e.mp3</span>\n`;
+
+      setTimeout(() => {
+        fireEvent('all_processing_completed', 'green', '✓ analysis', 'green');
+        
+        // Output final Claude AI Pipeline extraction payload
+        debug.innerHTML += `<span style="color:#38bdf8">[WEBHOOK - ${new Date().toLocaleTimeString()}]</span> event: <span style="color:#fbbf24">all_processing_completed</span>\n`;
+        debug.innerHTML += `<span style="color:#e2e8f0">// Claude Extraction Response:</span>\n`;
+        debug.innerHTML += `<span style="color:#fcd34d">${JSON.stringify({
+          intent: "appointment_booking",
+          booking_confirmed: true,
+          details: {
+            doctor: "Dr. Mehra",
+            date: "2026-05-23",
+            time: "10:30",
+            specialty: "Dermatology"
+          },
+          whatsapp_sent: true
+        }, null, 2)}</span>\n`;
+        
+        document.getElementById('inboundDebuggerDot').className = 'debugger-dot';
+        document.getElementById('inboundDebuggerDot').parentNode.nextElementSibling.textContent = 'STATUS: COMPLETE';
+
+        // Update stats
+        incrementStat('statInCalls');
+        incrementStat('statInResponded');
+        incrementStat('statInBooked');
+        
+        // Add row dynamically to Inbound calls table
+        const tbl = document.querySelector('#inboundCallsTable tbody');
+        const formattedNum = `+91 ${phone.slice(0,5)} ${phone.slice(5)}`;
+        const nowTime = new Date().toLocaleTimeString('en-IN', {hour: '2-digit', minute: '2-digit', hour12: true});
+        const newRow = document.createElement('tr');
+        newRow.innerHTML = `<td><span class="phone-mono">${formattedNum}</span></td><td>${nowTime}</td><td>1m 15s</td><td>appointment_booked</td><td><span class="pill pill-booked">Booked</span></td>`;
+        tbl.insertBefore(newRow, tbl.firstChild);
+
+        showToast(`WhatsApp confirmation sent to +91 ${phone} ✓`);
+      }, 1500);
+
+    }, 1500);
+    return;
+  }
+
+  const currentTurn = inboundDialogue[inboundChatIndex];
+  
+  if (currentTurn.sender === 'ai') {
+    // Waveform breathes (idle) while AI is thinking/typing
+    wave.classList.remove('active');
+    
+    // Show typing indicator
+    typing.style.display = 'block';
+    chatWin.appendChild(typing);
+    chatWin.scrollTop = chatWin.scrollHeight;
+
+    setTimeout(() => {
+      typing.style.display = 'none';
+      
+      // AI starts speaking -> Waveform goes ACTIVE (dancing)
+      wave.classList.add('active');
+      appendChatBubble(chatWin, 'ai', 'Ray AI', currentTurn.text, 'blue');
+      
+      setTimeout(() => {
+        // AI finishes speaking -> Waveform goes IDLE
+        wave.classList.remove('active');
+        inboundChatIndex++;
+        runInboundChatLoop(phone);
+      }, 3500);
+    }, 2000);
+  } else {
+    // Ray AI is idle/listening while patient thinks/speaks
+    wave.classList.remove('active');
+    
+    setTimeout(() => {
+      // Patient starts speaking -> Waveform goes ACTIVE (dancing)
+      wave.classList.add('active');
+      appendChatBubble(chatWin, 'patient', 'Patient', currentTurn.text, 'blue');
+      
+      setTimeout(() => {
+        // Patient finishes speaking -> Waveform goes IDLE
+        wave.classList.remove('active');
+        inboundChatIndex++;
+        runInboundChatLoop(phone);
+      }, 2500);
+    }, 1500);
+  }
+}
+
+
+// ── OUTBOUND CALL TRIGGER SIMULATION ──
+let outCallInterval=null,outCallSec=0;
+let outboundChatIndex = 0;
+
+function triggerOutboundCall(){
+  const outPhoneInputEl = document.getElementById('outPhoneInput');
+  const outPatientNameEl = document.getElementById('outPatientName');
+  const phone=outPhoneInputEl.value.replace(/\D/g,'');
+  const name=outPatientNameEl.value.trim() || "Anjali Sharma";
+  const doctor = document.getElementById('outDoctorName').value.trim() || "Dr. Mehra";
+  const specialty = document.getElementById('outSpecialty').value.trim() || "Dermatology";
+
+  if(phone.length<10){shake(outPhoneInputEl);return}
+
+  const btn=document.getElementById('outTriggerBtn'),icon=document.getElementById('outTriggerIcon'),txt=document.getElementById('outTriggerText');
+  const wave = document.getElementById('outboundWaveform');
+  const chatWin = document.getElementById('outboundChatWindow');
+  const chatPlaceholder = document.getElementById('outboundChatPlaceholder');
+  const typing = document.getElementById('outboundTypingBubble');
+  const debug = document.getElementById('outboundDebuggerBody');
+  const dbDot = document.getElementById('outboundDebuggerDot');
+  
+  btn.classList.add('loading');
+  btn.style.pointerEvents = 'none';
+  icon.innerHTML='<div class="spinner"></div>';
+  txt.textContent='Initiating RingAI Calling Hook API…';
+  
+  // Reset timeline & loggers
+  chatPlaceholder.style.opacity = '0';
+  document.querySelectorAll('#outboundChatWindow .chat-bubble:not(.typing-bubble)').forEach(el => el.remove());
+  resetTimeline('outEventLog');
+  setCallStatus('outCallStatusLabel','Initiating','var(--orange-text)');
+  dbDot.className = 'debugger-dot active';
+  dbDot.parentNode.nextElementSibling.textContent = 'STATUS: ACTIVE';
+  debug.innerHTML = '<span style="color:#64748b">// Requesting outbound initiate pipeline...\n</span>';
+
+  setTimeout(() => {
+    fireOutEvent('call_initiated', 'blue', 'triggered', 'blue');
+    setCallStatus('outCallStatusLabel','Dialling','var(--orange-text)');
+    txt.textContent=`Calling ${name}...`;
+    debug.innerHTML += `<span style="color:#10b981">[WEBHOOK - ${new Date().toLocaleTimeString()}]</span> event: <span style="color:#fbbf24">call_initiated</span> | from: <span style="color:#a78bfa">+912268095634</span> | to: <span style="color:#34d399">+91${phone}</span>\n`;
+  }, 1000);
+
+  setTimeout(() => {
+    fireOutEvent('call_started', 'blue', 'live', 'blue');
+    setCallStatus('outCallStatusLabel','Connected','var(--green-text)');
+    document.getElementById('outCallTimerWrap').style.display='block';
+    startOutTimer();
+    wave.classList.remove('active'); // Start breathing, not active dance
+    btn.classList.remove('loading');
+    icon.textContent='✓';
+    txt.textContent='Active Outbound Call';
+    debug.innerHTML += `<span style="color:#10b981">[WEBHOOK - ${new Date().toLocaleTimeString()}]</span> event: <span style="color:#fbbf24">call_started</span> | status: <span style="color:#34d399">CONNECTED</span>\n`;
+    
+    // Begin Outbound chat loop
+    outboundChatIndex = 0;
+    runOutboundChatLoop(name, doctor, specialty, phone);
+  }, 2200);
+}
+
+function runOutboundChatLoop(name, doctor, specialty, phone) {
+  const chatWin = document.getElementById('outboundChatWindow');
+  const typing = document.getElementById('outboundTypingBubble');
+  const debug = document.getElementById('outboundDebuggerBody');
+  const wave = document.getElementById('outboundWaveform');
+
+  const outboundDialogue = [
+    { sender: 'ai', text: `Hello ${name}! I hope you're feeling better. This is Ray, calling on behalf of ${doctor}'s office at the ${specialty} department regarding your recent OPD consultation.` },
+    { sender: 'patient', text: "Oh, hello. Yes, I'm doing better, thank you. How can I help you?" },
+    { sender: 'ai', text: `Glad to hear that! ${doctor} asked me to check in on your recovery. I see in your notes that a follow-up review was recommended. Would you like to schedule that follow-up appointment today?` },
+    { sender: 'patient', text: "Yes, actually. I wanted to schedule it. Do you have any open slots this coming Saturday?" },
+    { sender: 'ai', text: `Yes, we do! For next Saturday, we have slots open at 11:30 AM and 3:30 PM with ${doctor}. Would either of those be convenient for you?` },
+    { sender: 'patient', text: "Saturday at 11:30 AM works perfectly." },
+    { sender: 'ai', text: `Wonderful! I have booked your follow-up appointment for Saturday at 11:30 AM with ${doctor}. I have confirmed this in the system, and a WhatsApp confirmation is headed to your number +91 ${phone} now.` },
+    { sender: 'patient', text: "Thank you so much, Ray. Appreciate the call!" },
+    { sender: 'ai', text: "It is my absolute pleasure! Have a healthy and wonderful week ahead." }
+  ];
+
+  if (outboundChatIndex >= outboundDialogue.length) {
+    // End Outbound Call
+    setTimeout(() => {
+      stopOutTimer();
+      setCallStatus('outCallStatusLabel','Completed','var(--green-text)');
+      document.getElementById('outCallTimerWrap').style.display='none';
+      wave.classList.remove('active');
+      
+      const btn=document.getElementById('outTriggerBtn'),icon=document.getElementById('outTriggerIcon'),txt=document.getElementById('outTriggerText');
+      btn.style.pointerEvents = 'auto';
+      icon.textContent='📤';
+      txt.textContent='Trigger Outbound Agent';
+
+      // Timelines
+      fireOutEvent('call_completed', 'green', 'done', 'green');
+      
+      debug.innerHTML += `<span style="color:#10b981">[WEBHOOK - ${new Date().toLocaleTimeString()}]</span> event: <span style="color:#fbbf24">call_completed</span> | reason: <span style="color:#34d399">agent_hangup</span>\n`;
+
+      setTimeout(() => {
+        fireOutEvent('all_processing_completed', 'green', '✓ reactivated', 'green');
+        
+        // Output final Claude AI Pipeline extraction payload
+        debug.innerHTML += `<span style="color:#10b981">[WEBHOOK - ${new Date().toLocaleTimeString()}]</span> event: <span style="color:#fbbf24">all_processing_completed</span>\n`;
+        debug.innerHTML += `<span style="color:#e2e8f0">// Claude Post-Call Follow-Up Payload:</span>\n`;
+        debug.innerHTML += `<span style="color:#34d399">${JSON.stringify({
+          callee_name: name,
+          mobile_number: `+91${phone}`,
+          classification: "post_opd_followup_booked",
+          next_steps: {
+            scheduled_appointment_id: "sch_99182371",
+            appointment_date: "2026-05-23",
+            appointment_time: "11:30",
+            doctor: doctor,
+            specialty: specialty
+          },
+          lead_quality: "high",
+          retry_count: 0
+        }, null, 2)}</span>\n`;
+        
+        document.getElementById('outboundDebuggerDot').className = 'debugger-dot';
+        document.getElementById('outboundDebuggerDot').parentNode.nextElementSibling.textContent = 'STATUS: COMPLETE';
+
+        // Update queue tables dynamically
+        const queueRow = document.getElementById(`row-${name.replace(/\s+/g, '-')}`);
+        const statusPill = document.getElementById(`status-${name.replace(/\s+/g, '-')}`);
+        if (queueRow && statusPill) {
+          statusPill.textContent = "Booked";
+          statusPill.className = "pill pill-booked";
+        } else {
+          // If custom patient, add them dynamically
+          const tbl = document.querySelector('#outboundQueueTable tbody');
+          const newRow = document.createElement('tr');
+          newRow.innerHTML = `<td><div class="patient-name">${name}</div><div class="patient-meta">${specialty}</div></td><td><span class="last-visit">Yesterday</span></td><td><span class="flow-badge" style="background:var(--purple-light);color:var(--purple-text);border:1px solid var(--purple-mid)">${specialty} Review</span></td><td><span class="pill pill-booked">Booked</span></td>`;
+          tbl.insertBefore(newRow, tbl.firstChild);
+        }
+
+        // Increment Outbound stats
+        incrementStat('statReactivated');
+        incrementStat('statOutBooked');
+        document.getElementById('statReactivatedDelta').textContent = "↑ 12.1%";
+        
+        showToast(`WhatsApp confirmation sent to ${name} (+91 ${phone}) ✓`);
+      }, 1500);
+
+    }, 1500);
+    return;
+  }
+
+  const currentTurn = outboundDialogue[outboundChatIndex];
+  
+  if (currentTurn.sender === 'ai') {
+    // Waveform breathes (idle) while AI is thinking/typing
+    wave.classList.remove('active');
+    
+    // Show typing indicator
+    typing.style.display = 'block';
+    chatWin.appendChild(typing);
+    chatWin.scrollTop = chatWin.scrollHeight;
+
+    setTimeout(() => {
+      typing.style.display = 'none';
+      
+      // AI starts speaking -> Waveform goes ACTIVE (dancing)
+      wave.classList.add('active');
+      appendChatBubble(chatWin, 'ai', 'Ray AI', currentTurn.text, 'green');
+      
+      setTimeout(() => {
+        // AI finishes speaking -> Waveform goes IDLE
+        wave.classList.remove('active');
+        outboundChatIndex++;
+        runOutboundChatLoop(name, doctor, specialty, phone);
+      }, 3500);
+    }, 2000);
+  } else {
+    // Patient is about to speak (Ray AI is idle/listening)
+    wave.classList.remove('active');
+    
+    setTimeout(() => {
+      // Patient starts speaking -> Waveform goes ACTIVE (dancing)
+      wave.classList.add('active');
+      appendChatBubble(chatWin, 'patient', 'Patient', currentTurn.text, 'green');
+      
+      setTimeout(() => {
+        // Patient finishes speaking -> Waveform goes IDLE
+        wave.classList.remove('active');
+        outboundChatIndex++;
+        runOutboundChatLoop(name, doctor, specialty, phone);
+      }, 2500);
+    }, 1500);
+  }
+}
+
+// ── UTILITY FUNCTIONS ──
+function appendChatBubble(container, sender, label, text, themeColor) {
+  const bubble = document.createElement('div');
+  const cleanColor = themeColor === 'green' ? ' green' : '';
+  bubble.className = `chat-bubble ${sender}${cleanColor}`;
+  bubble.innerHTML = `<span class="sender">${label}</span>${text}`;
+  container.appendChild(bubble);
+  container.scrollTop = container.scrollHeight;
+}
+
+function startTimer(timerId){
+  clearInterval(callInterval);
+  callSec=0;
+  callInterval=setInterval(()=>{
+    callSec++;
+    document.getElementById(timerId).textContent=String(Math.floor(callSec/60)).padStart(2,'0')+':'+String(callSec%60).padStart(2,'0');
+  },1000);
+}
+function stopTimer(){clearInterval(callInterval)}
+
+function startOutTimer(){
+  clearInterval(outCallInterval);
+  outCallSec=0;
+  outCallInterval=setInterval(()=>{
+    outCallSec++;
+    document.getElementById('outCallTimer').textContent=String(Math.floor(outCallSec/60)).padStart(2,'0')+':'+String(outCallSec%60).padStart(2,'0');
+  },1000);
+}
+function stopOutTimer(){clearInterval(outCallInterval)}
+
+function incrementStat(elementId) {
+  const el = document.getElementById(elementId);
+  if(el) {
+    let val = parseInt(el.textContent.replace(/,/g, ''));
+    if(!isNaN(val)) {
+      el.textContent = (val + 1).toLocaleString('en-IN');
+    }
+  }
+}
+
+function shake(el){
+  el.style.borderColor='var(--red)';
+  el.style.boxShadow='0 0 0 5px var(--red-light)';
+  setTimeout(()=>{
+    el.style.borderColor='';
+    el.style.boxShadow='';
+  },1000);
+}
+
+function setCallStatus(id,label,color){
+  const el=document.getElementById(id);
+  el.textContent=label;
+  el.style.color=color;
+}
+
+function fireEvent(name,dotClass,status,stc){
+  const log=document.getElementById('eventLog');
+  const now=new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
+  const idx=['call_started','call_completed','recording_completed','all_processing_completed'].indexOf(name);
+  const row=log.children[idx];if(!row)return;
+  row.querySelector('.event-dot').className='event-dot '+dotClass;
+  row.querySelector('.event-name').style.color=stc==='green'?'var(--green-text)':'var(--blue-text)';
+  row.querySelector('.event-time').textContent=now;
+  const st=row.querySelector('.event-status');st.textContent=status;
+  st.style.background=stc==='green'?'var(--green-light)':'var(--blue-light)';
+  st.style.color=stc==='green'?'var(--green-text)':'var(--blue-text)';
+}
+
+function fireOutEvent(name,dotClass,status,stc){
+  const log=document.getElementById('outEventLog');
+  const now=new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
+  const idx=['call_initiated','call_started','call_completed','all_processing_completed'].indexOf(name);
+  const row=log.children[idx];if(!row)return;
+  row.querySelector('.event-dot').className='event-dot '+dotClass;
+  row.querySelector('.event-name').style.color=stc==='green'?'var(--green-text)':'var(--blue-text)';
+  row.querySelector('.event-time').textContent=now;
+  const st=row.querySelector('.event-status');st.textContent=status;
+  st.style.background=stc==='green'?'var(--green-light)':'var(--blue-light)';
+  st.style.color=stc==='green'?'var(--green-text)':'var(--blue-text)';
+}
+
+// ── CHANNEL BARS ──
+function animateBars(){document.querySelectorAll('.channel-bar').forEach(b=>{b.style.width=b.dataset.w})}
+setTimeout(animateBars,500);
+
+// ── DEMAND GENERATE ──
+const narratives=[
+  "Practo and Google Business drove 77% of bookings this month while ad spend dropped 22% — meaning every rupee worked harder. Video Shorts is your fastest-growing channel at 4.2K views per clip; doubling content output here could shift 10–15 more bookings at near-zero marginal cost.",
+  "Cost per lead fell to ₹290 — the lowest in 6 months — thanks to improved Practo listing quality and geo-fenced Meta creatives. WhatsApp broadcasts showed a 1-booking result this month; the segment is under-tested and worth a larger opt-in push next cycle.",
+  "Return on spend hit 2.4× this month, up from 1.7× in April. The PRP video short drove 4.2K organic views — auto-clipped content is now outperforming paid ads on a per-rupee basis. Recommend shifting 15% of Meta budget to content production next month."
+];
+let genN=0;
+
+function generateReport(){
+  const btn=document.getElementById('generateBtn'),icon=document.getElementById('genIcon'),txt=document.getElementById('genText');
+  btn.style.opacity='0.6';btn.style.pointerEvents='none';
+  icon.innerHTML='<div class="ai-thinking"><div class="ai-thinking-dot"></div><div class="ai-thinking-dot"></div><div class="ai-thinking-dot"></div></div>';
+  txt.textContent='Claude is analysing…';
+  
+  setTimeout(()=>{
+    genN=(genN+1)%narratives.length;document.getElementById('narrativeText').textContent=narratives[genN];
+    const b=43+Math.floor(Math.random()*12);
+    document.getElementById('m1').textContent=b;
+    document.getElementById('m2').textContent='₹'+(17000+Math.floor(Math.random()*5000)).toLocaleString('en-IN');
+    document.getElementById('m3').textContent='₹'+(260+Math.floor(Math.random()*80));
+    document.getElementById('m4').textContent=(1.8+Math.random()*1.2).toFixed(1)+'×';
+    btn.style.opacity='1';btn.style.pointerEvents='auto';
+    icon.textContent='✨';txt.textContent='Generate with Claude';
+    
+    showToast("Monthly Growth Report re-generated with Claude ✓");
+  },2800);
+}
+
+// ── COPY ──
+function copyText(text,el){
+  navigator.clipboard.writeText(text).then(()=>{
+    const o=el.innerHTML;
+    el.innerHTML='✓ Copied!';
+    el.style.color='var(--green-text)';
+    setTimeout(()=>{el.innerHTML=o;el.style.color=''},1600);
+  });
+}
+function copyPromptBlock(id,btn){
+  navigator.clipboard.writeText(document.getElementById(id).innerText).then(()=>{
+    btn.textContent='✓ Copied!';
+    btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='⎘ Copy';btn.classList.remove('copied')},2000);
+  });
+}
+</script>
+</body>
+</html>
