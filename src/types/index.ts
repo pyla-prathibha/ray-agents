@@ -41,8 +41,6 @@ export interface DoctorSignal {
 export interface DemandGenAnalysis {
   analyzed_signals: {
     high_intent_keywords: string[];
-    market_opportunity_score: number;
-    competitor_threat_level: "Low" | "Medium" | "High";
   };
   platforms: {
     practo_optimization: string;

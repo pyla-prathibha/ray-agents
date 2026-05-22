@@ -40,8 +40,8 @@ const STAT_LABELS = ["OPD Consults", "Followed Up", "Booked", "Consent"];
 
 export default function OutboundPanel({ onToast }: OutboundPanelProps) {
   const [phone, setPhone] = useState("");
-  const [patientName, setPatientName] = useState("Anjali Sharma");
-  const [doctorName, setDoctorName] = useState("Dr. Victor Mag");
+  const [patientName, setPatientName] = useState("Sharath");
+  const [doctorName, setDoctorName] = useState("Victor Mag");
   const [specialty, setSpecialty] = useState("Dentist");
 
   const [callStatus, setCallStatus] = useState("Idle");
@@ -272,13 +272,13 @@ export default function OutboundPanel({ onToast }: OutboundPanelProps) {
         <div>
           <div className="card-title">
             <span className="eyebrow-dot" style={{ color: "var(--green)", background: "var(--green)" }} />
-            Agent 2 · Outbound · Post OPD Follow-Up
+            Agent 2 · Outbound · Post Booking Call
           </div>
-          <h2 className="page-title">Post OPD Dialler</h2>
+          <h2 className="page-title">Post Booking Call</h2>
           <p className="page-sub">
             Automated follow-up calls for post-OPD patients — schedule reviews, collect feedback, and drive rebookings.
           </p>
-          <div className="agent-id-chip">35b9bb7d-c4ea-45eb-95c6-cc31f83e008f</div>
+          <div className="agent-id-chip">009fb2be-37bd-441b-aaa5-94c2a1946cad</div>
         </div>
         <div className="call-status-card">
           <span className="eyebrow-dot" style={{
@@ -495,7 +495,7 @@ export default function OutboundPanel({ onToast }: OutboundPanelProps) {
         <div className="card">
           <div className="card-title">
             <span className="card-title-dot" style={{ background: "var(--green)" }} />
-            Post OPD Follow-Up Queue · This Month
+            Post Booking Queue · This Month
           </div>
 
           <table className="data-table">

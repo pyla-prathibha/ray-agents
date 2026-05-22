@@ -122,9 +122,7 @@ Your goal is to analyze these signals and generate highly optimized playbooks ac
 You must return ONLY valid JSON (no markdown, no code fences) matching this exact schema:
 {
   "analyzed_signals": {
-    "high_intent_keywords": string[],
-    "market_opportunity_score": number,
-    "competitor_threat_level": "Low" | "Medium" | "High"
+    "high_intent_keywords": string[]
   },
   "channels": {
     "practo_listing": { "bookings": number, "pct": number },
@@ -161,8 +159,6 @@ export interface ClinicDashboardData {
 export interface DemandGenReport {
   analyzed_signals: {
     high_intent_keywords: string[];
-    market_opportunity_score: number;
-    competitor_threat_level: "Low" | "Medium" | "High";
   };
   channels: {
     practo_listing: { bookings: number; pct: number };
@@ -186,8 +182,6 @@ function getFallbackReport(): DemandGenReport {
   return {
     analyzed_signals: {
       high_intent_keywords: ["dental implants cost Bangalore", "root canal treatment Koramangala", "invisalign teeth alignment", "wisdom tooth extraction dentist"],
-      market_opportunity_score: 84,
-      competitor_threat_level: "Medium",
     },
     channels: {
       practo_listing: { bookings: 22, pct: 47 },

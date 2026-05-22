@@ -9,7 +9,7 @@ interface SidebarProps {
 
 const NAV_ITEMS: { id: Panel; icon: string; title: string; meta: string; badge: string; badgeClass: string; agent: string }[] = [
   { id: "inbound", icon: "📞", title: "Apt Booking · Inbound", meta: "Patient booking calls", badge: "Live", badgeClass: "badge-blue", agent: "inbound" },
-  { id: "outbound", icon: "📤", title: "Post OPD · Outbound", meta: "Post-consultation calls", badge: "Active", badgeClass: "badge-green", agent: "outbound" },
+  { id: "outbound", icon: "📤", title: "Post Booking · Outbound", meta: "Post-booking follow-ups", badge: "Active", badgeClass: "badge-green", agent: "outbound" },
   { id: "reactivation", icon: "🔄", title: "Reactivation · Outbound", meta: "Dormant patient calls", badge: "Active", badgeClass: "badge-green", agent: "outbound" },
   { id: "demand", icon: "📊", title: "Demand Gen · Report", meta: "Monthly growth metrics", badge: "May", badgeClass: "badge-purple", agent: "demand" },
 ];

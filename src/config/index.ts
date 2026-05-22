@@ -8,8 +8,8 @@ export const config = {
     baseUrl: "https://prod-api.ringg.ai/ca/api/v0",
     inboundAgentId: "4d03f9cd-320b-49bf-adbb-cbe8fdde9c59",
     inboundNumber: "+918031137408",
-    // Post OPD Follow-up Agent
-    postOpdAgentId: "35b9bb7d-c4ea-45eb-95c6-cc31f83e008f",
+    // Post Booking Call Agent
+    postOpdAgentId: "009fb2be-37bd-441b-aaa5-94c2a1946cad",
     postOpdFromNumberId: "ffc7dd03-3a4d-46ef-9aab-5aba0699ad36",
     postOpdFromNumber: "+912268095634",
     // Patient Reactivation Agent

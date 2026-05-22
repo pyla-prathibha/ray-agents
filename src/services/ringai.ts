@@ -42,21 +42,21 @@ function buildCustomArgs(params: InitiateCallParams): Record<string, string> {
   };
 
   if (params.agentType === "post-opd") {
-    // Post OPD agent requires these specific args
+    // Post Booking Call agent
     return {
       ...common,
-      patient_id: "PAT-001",
-      patient_name: params.patientName,
-      doctor_name: params.customArgs?.doctor_name || "Dr. Victor Mag",
-      doctor_specialty: params.customArgs?.doctor_specialty || "Dentist",
-      appointment_date: new Date().toISOString().split("T")[0],
-      appointment_time: "10:30",
-      scheduler_appointment_id: "SCH-001",
-      appointment_id: "APT-001",
-      doctor_reference_id: "DREF-001",
-      practice_reference_id: "PREF-001",
-      doctor_id: "DOC-001",
-      practice_id: "PRC-001",
+      practice_name: params.customArgs?.practice_name || "MR City Clinic",
+      doctor_name: params.customArgs?.doctor_name || "Victor Mag",
+      appointment_time: params.customArgs?.appointment_time || "18:00",
+      appointment_date: params.customArgs?.appointment_date || "2026-05-23",
+      call_scenario: params.customArgs?.call_scenario || "CONFIRMATION",
+      recent_visit_date: params.customArgs?.recent_visit_date || "2026-05-18",
+      advised_treatment: params.customArgs?.advised_treatment || "Root Canal Treatment",
+      doctor_reference_id: params.customArgs?.doctor_reference_id || "85fc1e48-602a-41fb-af83-ec65a9ef7660",
+      practice_reference_id: params.customArgs?.practice_reference_id || "cb44e142-8fa1-4559-ae12-d595833ee5c3",
+      practice_doctor_id: params.customArgs?.practice_doctor_id || "636754",
+      doctor_id: params.customArgs?.doctor_id || "666305",
+      practice_id: params.customArgs?.practice_id || "1193594",
       ...params.customArgs,
     };
   }
