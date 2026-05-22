@@ -1,6 +1,8 @@
 import { callClaude } from "./claude";
 import { config } from "@/config";
 import { fetchEstablishment, fetchProvider, searchDoctors, type PractoEstablishment, type PractoDoctor } from "./practoApi";
+import fs from "fs";
+import path from "path";
 
 export interface Competitor {
   rank: number;
@@ -11,6 +13,8 @@ export interface Competitor {
   experience: string;
   review_count: number;
   monetisable_txns: number;
+  specialty_txns?: number;
+  is_heuristic?: boolean;
   conversion: number;
 }
 
@@ -22,6 +26,88 @@ export interface CompetitorSummary {
 
 import searchTrends from "@/data/metrics/search_trends.json";
 import geoIntent from "@/data/metrics/geo_intent.json";
+
+interface CSVRow {
+  practice_id: string;
+  practice_name: string;
+  zone: string;
+  speciality: string;
+  monetisable_txns: number;
+  establishment_uuid?: string; // Placeholder for future string UUID
+}
+
+function parseCSV(filePath: string): CSVRow[] {
+  try {
+    if (!fs.existsSync(filePath)) {
+      console.warn(`[CSV Parser] File not found: ${filePath}`);
+      return [];
+    }
+    const content = fs.readFileSync(filePath, "utf8");
+    const lines = content.split(/\r?\n/);
+    if (lines.length === 0) return [];
+    
+    // Parse header to find index mapping
+    const headers = lines[0].split(",").map(h => h.trim().toLowerCase());
+    const idIdx = headers.indexOf("practice_id");
+    const nameIdx = headers.indexOf("practice_name");
+    const zoneIdx = headers.indexOf("zone");
+    const specIdx = headers.indexOf("speciality");
+    const txnsIdx = headers.indexOf("monetisable_txns");
+    
+    // Check if there is a placeholder uuid column
+    const uuidIdx = headers.findIndex(h => h.includes("uuid") || h.includes("reference") || h.includes("establishment_id"));
+
+    const rows: CSVRow[] = [];
+    for (let i = 1; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (!line) continue;
+      
+      // Basic CSV splitter to support simple formats
+      let parts: string[] = [];
+      let current = "";
+      let inQuotes = false;
+      for (let j = 0; j < line.length; j++) {
+        const char = line[j];
+        if (char === '"' || char === "'") {
+          inQuotes = !inQuotes;
+        } else if (char === ',' && !inQuotes) {
+          parts.push(current.trim());
+          current = "";
+        } else {
+          current += char;
+        }
+      }
+      parts.push(current.trim());
+      
+      if (parts.length < 5) continue;
+      
+      rows.push({
+        practice_id: parts[idIdx] || "",
+        practice_name: parts[nameIdx] || "",
+        zone: parts[zoneIdx] || "",
+        speciality: parts[specIdx] || "",
+        monetisable_txns: parseInt(parts[txnsIdx] || "0", 10) || 0,
+        establishment_uuid: uuidIdx !== -1 ? parts[uuidIdx] : undefined
+      });
+    }
+    return rows;
+  } catch (err) {
+    console.error("[CSV Parser] Error parsing sales_transactions.csv:", err);
+    return [];
+  }
+}
+
+function findClinic(clinicId: string, clinicName: string, locality: string, rows: CSVRow[]): CSVRow | null {
+  // 1. Try exact match on UUID (placeholder for data analytics team)
+  const uuidMatch = rows.find(r => r.establishment_uuid === clinicId);
+  if (uuidMatch) return uuidMatch;
+  
+  // 2. Try match on numeric ID (if client passes practice_id as parameter)
+  const idMatch = rows.find(r => r.practice_id.trim() === clinicId.trim());
+  if (idMatch) return idMatch;
+
+  return null;
+}
 
 const SYSTEM_PROMPT = `You are the Ray AI Lead Demand Generation Analyst.
 You will be provided with four market signals datasets in XML tags: <search_trends>, <geo_intent>, <competitor_density>, and <doctor_signal>.
@@ -69,6 +155,7 @@ export interface ClinicDashboardData {
   searchTrends: typeof searchTrends;
   geoIntent: typeof geoIntent;
   report: DemandGenReport | null;
+  our_monetisable_txns?: number;
 }
 
 export interface DemandGenReport {
@@ -128,7 +215,8 @@ function getFallbackReport(): DemandGenReport {
 export async function fetchClinicData(clinicId: string): Promise<ClinicDashboardData> {
   let clinic: PractoEstablishment;
   let doctors: PractoDoctor[] = [];
-  let competitors: CompetitorSummary = { total_clinics_in_radius: 3, avg_rating: 4.1, top_competitors: [] };
+  let competitors: CompetitorSummary = { total_clinics_in_radius: 3, avg_rating: 4.7, top_competitors: [] };
+  let our_monetisable_txns = 0;
 
   try {
     clinic = await fetchEstablishment(clinicId);
@@ -141,7 +229,7 @@ export async function fetchClinicData(clinicId: string): Promise<ClinicDashboard
       city: "Bangalore",
       pincode: "",
       geolocation: "",
-      locality: "koramangala",
+      locality: "hsr layout",
       doctors: [],
     };
   }
@@ -171,57 +259,155 @@ export async function fetchClinicData(clinicId: string): Promise<ClinicDashboard
     return b.reviews.response_count - a.reviews.response_count;
   });
 
-  // Get competitors from live Practo Search API using geolocation if available
-  let searchDocs: any[] = [];
-  const hasToken = !!config.practo.bearerToken;
-  const geolocation = clinic.geolocation || "27.58517661216576,91.85680680418842";
-  const city = clinic.city || "bangalore";
-  
-  if (hasToken) {
-    try {
-      searchDocs = await searchDoctors("Dentist", geolocation, city);
-    } catch (err) {
-      console.warn("[DemandGen] Live searchDoctors failed, trying fallback:", err);
+  // CSV-based Sales Transactions Competitor and Clinic Transaction Lookup
+  let csvResolved = false;
+  try {
+    const localCsvPath = path.join(process.cwd(), "src/data/sales_transactions.csv");
+    const localSpecialtyCsvPath = path.join(process.cwd(), "src/data/sales_transactions_by_speciality.csv");
+
+    // 1. Load Specialty Lookup Map for Exact Per-Specialty Transactions
+    const specialtyLookupMap = new Map<string, number>();
+    if (fs.existsSync(localSpecialtyCsvPath)) {
+      const specRows = parseCSV(localSpecialtyCsvPath);
+      specRows.forEach(row => {
+        // Key format: practiceId_specialty
+        const key = `${row.practice_id.trim()}_${row.speciality.trim().toLowerCase()}`;
+        specialtyLookupMap.set(key, row.monetisable_txns);
+      });
+      console.log(`[DemandGen] Parsed specialty breakout map with ${specialtyLookupMap.size} entries.`);
     }
+
+    if (fs.existsSync(localCsvPath)) {
+      const csvRows = parseCSV(localCsvPath);
+      
+      if (csvRows.length > 0) {
+        const matched = findClinic(clinicId, clinic.name, clinic.locality || "hsr layout", csvRows);
+        
+        if (matched) {
+          const targetZone = (matched.zone || clinic.locality || "hsr layout").trim().toLowerCase();
+          const targetSpec = "General Dentistry";
+
+          // Helper function to resolve per-specialty transactions (exact or heuristic fallback)
+          const getSpecialtyTxns = (practiceId: string, totalTxns: number, specialtyListStr: string, specName: string) => {
+            const specKey = `${practiceId.trim()}_${specName.trim().toLowerCase()}`;
+            if (specialtyLookupMap.has(specKey)) {
+              return { txns: specialtyLookupMap.get(specKey) || 0, isHeuristic: false };
+            }
+            // Heuristic Fallback
+            const specs = specialtyListStr.split(";").map(s => s.trim()).filter(Boolean);
+            const divisor = specs.length || 1;
+            return { txns: Math.round(totalTxns / divisor), isHeuristic: true };
+          };
+
+          // Resolve our clinic's specific dental transactions
+          const ourResolved = getSpecialtyTxns(matched.practice_id, matched.monetisable_txns, matched.speciality, targetSpec);
+          our_monetisable_txns = ourResolved.txns;
+
+          // Find competitors in same zone with speciality 'General Dentistry' (or contains it) excluding our own practice_id
+          const dentalCompetitors = csvRows.filter(r => {
+            if (r.zone.trim().toLowerCase() !== targetZone) return false;
+            if (r.practice_id.trim() === matched.practice_id.trim()) return false;
+            
+            const specialties = r.speciality.split(";").map(s => s.trim().toLowerCase());
+            return specialties.includes(targetSpec.toLowerCase());
+          });
+
+          // Sort competitors by specialty transactions descending (tie breaker by overall volume)
+          dentalCompetitors.sort((a, b) => {
+            const txnsA = getSpecialtyTxns(a.practice_id, a.monetisable_txns, a.speciality, targetSpec).txns;
+            const txnsB = getSpecialtyTxns(b.practice_id, b.monetisable_txns, b.speciality, targetSpec).txns;
+            if (txnsB !== txnsA) return txnsB - txnsA;
+            return b.monetisable_txns - a.monetisable_txns;
+          });
+          
+          const top3 = dentalCompetitors.slice(0, 3).map((item, idx) => {
+            const resolved = getSpecialtyTxns(item.practice_id, item.monetisable_txns, item.speciality, targetSpec);
+            return {
+              rank: idx + 1,
+              practice_name: item.practice_name || "Unknown Practice",
+              doctor_name: "Lead Practitioner",
+              locality: item.zone || targetZone,
+              speciality: item.speciality || "General Dentistry",
+              experience: "Top Tier",
+              review_count: item.monetisable_txns, // Overall for backward compat
+              monetisable_txns: item.monetisable_txns, // Overall
+              specialty_txns: resolved.txns, // Specialty specific
+              is_heuristic: resolved.isHeuristic, // Heuristic flag
+              conversion: 95,
+            };
+          });
+
+          competitors = {
+            total_clinics_in_radius: top3.length, // Show only top 3 clinics as requested by user
+            avg_rating: 4.8,
+            top_competitors: top3,
+          };
+          csvResolved = true;
+        }
+      }
+    }
+  } catch (err) {
+    console.error("[DemandGen] CSV-based competitor lookup failed, falling back:", err);
   }
 
-  if (searchDocs && searchDocs.length > 0) {
-    const scores = searchDocs.map(d => d.patient_experience_score).filter(Boolean);
-    const avgScore = scores.length > 0 ? scores.reduce((sum, s) => sum + s, 0) / scores.length : 95;
-    const avgRating = Math.round((avgScore / 20) * 10) / 10;
+  // Live Search Doctors API (Kept commented out as fallback)
+  /*
+  if (!csvResolved) {
+    let searchDocs: any[] = [];
+    const hasToken = !!config.practo.bearerToken;
+    const geolocation = clinic.geolocation || "27.58517661216576,91.85680680418842";
+    const city = clinic.city || "bangalore";
     
-    const top3 = searchDocs.slice(0, 3).map((item, idx) => {
-      const rawFee = item.consultation_fee || "";
-      const cleanedFee = typeof rawFee === "string" ? rawFee.replace(/INR\s*/i, "").trim() : String(rawFee);
-      const conversionPct = item.patient_experience_score || 93;
-      
-      return {
-        rank: idx + 1,
-        practice_name: item.practice_name || "Unknown Practice",
-        doctor_name: item.doctor_name || "Unknown Doctor",
-        locality: item.practice_address || "Local",
-        speciality: item.speciality || "Dentist",
-        experience: item.experience || "10 years",
-        review_count: item.review_count || 0,
-        monetisable_txns: item.review_count || 50,
-        conversion: conversionPct,
-      };
-    });
+    if (hasToken) {
+      try {
+        searchDocs = await searchDoctors("Dentist", geolocation, city);
+      } catch (err) {
+        console.warn("[DemandGen] Live searchDoctors failed, trying fallback:", err);
+      }
+    }
 
-    competitors = {
-      total_clinics_in_radius: searchDocs.length,
-      avg_rating: avgRating || 4.1,
-      top_competitors: top3,
-    };
-  } else {
-    // Robust mock fallback to top Bangalore dental competitors matching live search structure
+    if (searchDocs && searchDocs.length > 0) {
+      const scores = searchDocs.map(d => d.patient_experience_score).filter(Boolean);
+      const avgScore = scores.length > 0 ? scores.reduce((sum, s) => sum + s, 0) / scores.length : 95;
+      const avgRating = Math.round((avgScore / 20) * 10) / 10;
+      
+      const top3 = searchDocs.slice(0, 3).map((item, idx) => {
+        const rawFee = item.consultation_fee || "";
+        const cleanedFee = typeof rawFee === "string" ? rawFee.replace(new RegExp("INR\\s*", "i"), "").trim() : String(rawFee);
+        const conversionPct = item.patient_experience_score || 93;
+        
+        return {
+          rank: idx + 1,
+          practice_name: item.practice_name || "Unknown Practice",
+          doctor_name: item.doctor_name || "Unknown Doctor",
+          locality: item.practice_address || "Local",
+          speciality: item.speciality || "Dentist",
+          experience: item.experience || "10 years",
+          review_count: item.review_count || 0,
+          monetisable_txns: item.review_count || 50,
+          conversion: conversionPct,
+        };
+      });
+
+      competitors = {
+        total_clinics_in_radius: searchDocs.length,
+        avg_rating: avgRating || 4.1,
+        top_competitors: top3,
+      };
+      csvResolved = true;
+    }
+  }
+  */
+
+  // Hardcoded Robust Fallback (only used if CSV and API both fail)
+  if (!csvResolved) {
     const fallbackCompetitors: Competitor[] = [
       {
         rank: 1,
         practice_name: "Dental De Care",
         doctor_name: "Dr. K A Mohan",
         locality: "domlur",
-        speciality: "Orthodontist",
+        speciality: "General Dentistry",
         experience: "57 years",
         review_count: 76,
         monetisable_txns: 76,
@@ -232,7 +418,7 @@ export async function fetchClinicData(clinicId: string): Promise<ClinicDashboard
         practice_name: "Vignesh Dental Speciality Centre",
         doctor_name: "Dr. D N Naveen",
         locality: "new thippasandra",
-        speciality: "Endodontist",
+        speciality: "General Dentistry",
         experience: "32 years",
         review_count: 103,
         monetisable_txns: 103,
@@ -243,7 +429,7 @@ export async function fetchClinicData(clinicId: string): Promise<ClinicDashboard
         practice_name: "V-Care Dental Speciality Clinic",
         doctor_name: "Dr. Sanjay Kaul",
         locality: "koramangala",
-        speciality: "Periodontist",
+        speciality: "General Dentistry",
         experience: "30 years",
         review_count: 576,
         monetisable_txns: 576,
@@ -252,7 +438,7 @@ export async function fetchClinicData(clinicId: string): Promise<ClinicDashboard
     ];
 
     competitors = {
-      total_clinics_in_radius: 580,
+      total_clinics_in_radius: 3,
       avg_rating: 4.7,
       top_competitors: fallbackCompetitors,
     };
@@ -295,6 +481,7 @@ export async function fetchClinicData(clinicId: string): Promise<ClinicDashboard
     searchTrends,
     geoIntent,
     report,
+    our_monetisable_txns,
   };
 }
 

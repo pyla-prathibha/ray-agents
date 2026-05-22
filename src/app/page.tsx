@@ -39,9 +39,15 @@ export default function Dashboard() {
         <Sidebar activePanel={activePanel} onSwitch={switchPanel} />
 
         <main className="main" ref={mainRef}>
-          {activePanel === "inbound" && <InboundPanel onToast={showToast} />}
-          {activePanel === "outbound" && <OutboundPanel onToast={showToast} />}
-          {activePanel === "demand" && <DemandGenPanel onToast={showToast} />}
+          <div style={{ display: activePanel === "inbound" ? "block" : "none" }}>
+            <InboundPanel onToast={showToast} />
+          </div>
+          <div style={{ display: activePanel === "outbound" ? "block" : "none" }}>
+            <OutboundPanel onToast={showToast} />
+          </div>
+          <div style={{ display: activePanel === "demand" ? "block" : "none" }}>
+            <DemandGenPanel onToast={showToast} />
+          </div>
         </main>
       </div>
 

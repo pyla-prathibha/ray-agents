@@ -40,9 +40,9 @@ const STAT_LABELS = ["OPD Consults", "Followed Up", "Booked", "Consent"];
 
 export default function OutboundPanel({ onToast }: OutboundPanelProps) {
   const [phone, setPhone] = useState("");
-  const [patientName, setPatientName] = useState("");
-  const [doctorName, setDoctorName] = useState("");
-  const [specialty, setSpecialty] = useState("");
+  const [patientName, setPatientName] = useState("Anjali Sharma");
+  const [doctorName, setDoctorName] = useState("Dr. Victor Mag");
+  const [specialty, setSpecialty] = useState("Dentist");
 
   const [callStatus, setCallStatus] = useState("Idle");
   const [callActive, setCallActive] = useState(false);
@@ -80,15 +80,111 @@ export default function OutboundPanel({ onToast }: OutboundPanelProps) {
     []
   );
 
-  const triggerOutboundCall = useCallback(() => {
+  // Poll for live webhook events
+  const pollCallEvents = useCallback(
+    (callId: string) => {
+      let lastEventCount = 0;
+      const pollInterval = setInterval(async () => {
+        try {
+          const res = await fetch(`/api/calls/events?call_id=${callId}`);
+          const data = await res.json();
+          if (!data.success || !data.call) return;
+
+          const call = data.call;
+          const events = call.events || [];
+
+          // Process new events
+          for (let i = lastEventCount; i < events.length; i++) {
+            const ev = events[i];
+            const eventType = ev.event_type;
+            const eventIdx = INITIAL_EVENTS.findIndex((e) => e.name === eventType);
+
+            addDebug(
+              `<span style="color:#10b981">[${ev.timestamp?.slice(11, 19) || ts()}]</span> <span style="color:#94a3b8">WEBHOOK</span> ${eventType}${ev.status ? ` | status: ${ev.status}` : ""}${ev.sub_status ? ` | sub_status: ${ev.sub_status}` : ""}`
+            );
+
+            if (eventIdx !== -1) {
+              updateEvent(eventIdx, "green", "RECEIVED", "green");
+            }
+
+            if (eventType === "call_started") {
+              setCallStatus("Connected");
+              setWaveActive(true);
+            }
+
+            if (eventType === "call_completed") {
+              setCallStatus(ev.sub_status === "VOICEMAIL_DETECTED" ? "Voicemail" : "Completed");
+              setWaveActive(false);
+
+              // Show transcript if available
+              if (ev.transcript && ev.transcript.length > 0) {
+                const msgs = ev.transcript.map((turn: Record<string, string>) => ({
+                  sender: turn.bot ? ("ai" as const) : ("patient" as const),
+                  text: turn.bot || turn.user || "",
+                }));
+                setChatMessages(msgs);
+              }
+            }
+
+            if (eventType === "all_processing_completed") {
+              addDebug(
+                `<span style="color:#10b981">[${ts()}]</span> <span style="color:#64748b">--- Platform analysis ---</span>`
+              );
+              if (ev.platform_analysis) {
+                addDebug(
+                  `<span style="color:#34d399">${JSON.stringify(ev.platform_analysis, null, 2).replace(/\n/g, "<br/>")}</span>`
+                );
+              }
+            }
+
+            if (eventType === "claude_analysis_completed" && ev.claude_analysis) {
+              addDebug(
+                `<span style="color:#10b981">[${ts()}]</span> <span style="color:#64748b">--- Claude analysis ---</span>`
+              );
+              addDebug(
+                `<span style="color:#34d399">${JSON.stringify(ev.claude_analysis, null, 2).replace(/\n/g, "<br/>")}</span>`
+              );
+              setDebugStatus("COMPLETE");
+              setDebugActive(false);
+            }
+          }
+          lastEventCount = events.length;
+
+          // Stop polling when call is done
+          if (call.status === "completed" || call.status === "failed" || call.status === "voicemail") {
+            // Wait a bit more for Claude analysis
+            setTimeout(() => {
+              clearInterval(pollInterval);
+              setCallActive(false);
+              if (timerRef.current) {
+                clearInterval(timerRef.current);
+                timerRef.current = null;
+              }
+              setShowTimer(false);
+            }, 15000);
+          }
+        } catch {
+          // Polling error — continue silently
+        }
+      }, 2000);
+
+      return pollInterval;
+    },
+    [addDebug, updateEvent]
+  );
+
+  const triggerOutboundCall = useCallback(async () => {
     if (callActive) return;
 
     const name = patientName.trim() || "Anjali Sharma";
     const doctor = doctorName.trim() || "Dr. Victor Mag";
     const spec = specialty.trim() || "Dentist";
-    const ph = phone.trim() || "9876543210";
+    const ph = phone.trim();
 
-    const dialogue = buildOutboundDialogue(name, doctor, spec, ph);
+    if (!ph || ph.replace(/\D/g, "").length < 10) {
+      onToast("Enter a valid 10-digit phone number");
+      return;
+    }
 
     // Reset state
     setChatMessages([]);
@@ -97,114 +193,70 @@ export default function OutboundPanel({ onToast }: OutboundPanelProps) {
     setCallTimer(0);
     setShowTimer(true);
     setCallActive(true);
-    setWaveActive(true);
+    setWaveActive(false);
     setDebugActive(true);
     setDebugStatus("ACTIVE");
-    setCallStatus("Ringing…");
+    setCallStatus("Initiating...");
 
     // Start timer
     timerRef.current = setInterval(() => {
       setCallTimer((t) => t + 1);
     }, 1000);
 
-    // Event 0: call_initiated
-    addDebug(`<span style="color:#10b981">[${ts()}]</span> <span style="color:#94a3b8">▸ POST</span> /webhook/outbound`);
-    addDebug(`<span style="color:#10b981">[${ts()}]</span> <span style="color:#64748b">event:</span> call_initiated`);
-    addDebug(`<span style="color:#10b981">[${ts()}]</span> <span style="color:#64748b">callee:</span> ${name} | mobile: +91 ${ph}`);
-    updateEvent(0, "green", "FIRED", "green");
+    addDebug(
+      `<span style="color:#10b981">[${ts()}]</span> Initiating outbound call via RingAI API...`
+    );
+    addDebug(
+      `<span style="color:#10b981">[${ts()}]</span> patient: ${name} | phone: +91${ph.replace(/\D/g, "")} | doctor: ${doctor}`
+    );
 
-    // Event 1: call_started (after 1.5s)
-    setTimeout(() => {
-      setCallStatus("Connected");
-      updateEvent(1, "green", "FIRED", "green");
-      addDebug(`<span style="color:#10b981">[${ts()}]</span> <span style="color:#94a3b8">▸ POST</span> /webhook/outbound`);
-      addDebug(`<span style="color:#10b981">[${ts()}]</span> <span style="color:#64748b">event:</span> call_started`);
-      addDebug(`<span style="color:#10b981">[${ts()}]</span> <span style="color:#64748b">doctor:</span> ${doctor} | specialty: ${spec}`);
+    try {
+      const res = await fetch("/api/calls/outbound", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          patient_name: name,
+          mobile_number: ph.replace(/\D/g, ""),
+          doctor_name: doctor,
+          doctor_specialty: spec,
+        }),
+      });
 
-      // Stream dialogue
-      let msgIndex = 0;
-      const interval = setInterval(() => {
-        if (msgIndex < dialogue.length) {
-          const msg = dialogue[msgIndex];
-          if (msg.sender === "ai") {
-            setShowTyping(true);
-            setTimeout(() => {
-              setShowTyping(false);
-              setChatMessages((prev) => [...prev, msg]);
-            }, 600);
-          } else {
-            setChatMessages((prev) => [...prev, msg]);
-          }
-          msgIndex++;
-        } else {
-          clearInterval(interval);
+      const data = await res.json();
 
-          // Event 2: call_completed
-          setTimeout(() => {
-            setCallStatus("Completed");
-            setWaveActive(false);
-            updateEvent(2, "green", "FIRED", "green");
-            addDebug(`<span style="color:#10b981">[${ts()}]</span> <span style="color:#94a3b8">▸ POST</span> /webhook/outbound`);
-            addDebug(`<span style="color:#10b981">[${ts()}]</span> <span style="color:#64748b">event:</span> call_completed`);
-            addDebug(`<span style="color:#10b981">[${ts()}]</span> <span style="color:#64748b">duration:</span> ${dialogue.length * 1.8}s`);
+      if (data.success && data.call_id) {
+        addDebug(
+          `<span style="color:#10b981">[${ts()}]</span> <span style="color:#34d399">Call initiated!</span> call_id: <span style="color:#c4b5fd">${data.call_id}</span>`
+        );
+        setCallStatus("Ringing...");
+        updateEvent(0, "green", "INITIATED", "green");
 
-            // Event 3: all_processing_completed
-            setTimeout(() => {
-              updateEvent(3, "green", "FIRED", "green");
-              addDebug(`<span style="color:#10b981">[${ts()}]</span> <span style="color:#94a3b8">▸ POST</span> /webhook/outbound`);
-              addDebug(`<span style="color:#10b981">[${ts()}]</span> <span style="color:#64748b">event:</span> all_processing_completed`);
-              addDebug(`<span style="color:#10b981">[${ts()}]</span> <span style="color:#64748b">--- Claude extraction payload ---</span>`);
-              addDebug(`<span style="color:#10b981">[${ts()}]</span> callee_name: "${name}"`);
-              addDebug(`<span style="color:#10b981">[${ts()}]</span> mobile_number: "+91 ${ph}"`);
-              addDebug(`<span style="color:#10b981">[${ts()}]</span> classification: "follow_up_booked"`);
-              addDebug(`<span style="color:#10b981">[${ts()}]</span> next_steps: "Saturday 11:30 AM with ${doctor}"`);
-              addDebug(`<span style="color:#10b981">[${ts()}]</span> lead_quality: "high"`);
-              addDebug(`<span style="color:#10b981">[${ts()}]</span> retry_count: 0`);
+        // Start polling for live webhook events
+        const interval = pollCallEvents(data.call_id);
 
-              setDebugStatus("COMPLETE");
-              setDebugActive(false);
-              setCallActive(false);
-
-              if (timerRef.current) {
-                clearInterval(timerRef.current);
-                timerRef.current = null;
-              }
-
-              // Update queue patient or prepend new row
-              setQueuePatients((prev) => {
-                const idx = prev.findIndex((p) => p.name === name);
-                if (idx !== -1) {
-                  const next = [...prev];
-                  next[idx] = { ...next[idx], status: "Booked" };
-                  return next;
-                }
-                return [
-                  {
-                    id: name.replace(/\s+/g, "-"),
-                    name,
-                    meta: spec,
-                    visit: "Today",
-                    cohort: `${spec} Follow-up`,
-                    cohortStyle: "green",
-                    status: "Booked",
-                  },
-                  ...prev,
-                ];
-              });
-
-              setStats((s) => ({
-                ...s,
-                followedUp: s.followedUp + 1,
-                booked: s.booked + 1,
-              }));
-
-              onToast(`WhatsApp confirmation sent to ${name} at +91 ${ph}`);
-            }, 1200);
-          }, 800);
-        }
-      }, 1800);
-    }, 1500);
-  }, [callActive, patientName, doctorName, specialty, phone, addDebug, updateEvent, onToast]);
+        // Cleanup on unmount
+        return () => {
+          if (interval) clearInterval(interval);
+        };
+      } else {
+        throw new Error(data.error || "Call initiation failed");
+      }
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : "Unknown error";
+      addDebug(
+        `<span style="color:#f87171">[${ts()}]</span> ERROR: ${msg}`
+      );
+      setCallStatus("Failed");
+      setCallActive(false);
+      setDebugActive(false);
+      setDebugStatus("IDLE");
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+      onToast(`Call failed: ${msg}`);
+    }
+  }, [callActive, patientName, doctorName, specialty, phone, addDebug, updateEvent, onToast, pollCallEvents]);
 
   const formatTime = (s: number) =>
     `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;

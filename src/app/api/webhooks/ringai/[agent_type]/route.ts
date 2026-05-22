@@ -30,8 +30,8 @@ export async function POST(
   }
   processedEvents.add(dedupeKey);
 
-  // Acknowledge immediately
-  const response = new NextResponse(null, { status: 204 });
+  // Acknowledge immediately (RingAI expects 200 within 30s)
+  const response = NextResponse.json({ received: true }, { status: 200 });
 
   // Route to agent handler asynchronously
   if (agent_type === "inbound") {

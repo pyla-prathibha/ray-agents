@@ -58,7 +58,9 @@ export default function InboundPanel({ onToast }: InboundPanelProps) {
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (chatMessages.length > 0 || showTyping) {
+      chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
   }, [chatMessages, showTyping]);
 
   const addDebug = useCallback((line: string) => {

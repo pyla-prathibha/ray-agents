@@ -1,6 +1,4 @@
-"use client";
-
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { WHY_DOCTORS } from "@/agents/demand-gen/data";
 import { type ClinicDashboardData } from "@/services/demandGen";
 
@@ -31,18 +29,28 @@ const BADGE_CLASS: Record<string, string> = {
 };
 
 export default function DemandGenPanel({ onToast }: DemandGenPanelProps) {
-  const [clinicId, setClinicId] = useState("c9d8655e-90c2-42f1-9ab8-f5cc214e8aea");
-  const [clinicIdInput, setClinicIdInput] = useState("c9d8655e-90c2-42f1-9ab8-f5cc214e8aea");
+  const [clinicId, setClinicId] = useState("");
+  const [clinicIdInput, setClinicIdInput] = useState("");
   const [data, setData] = useState<ClinicDashboardData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showAllDoctors, setShowAllDoctors] = useState(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const loadClinicData = useCallback(async (id: string) => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/clinic/data?clinicId=${encodeURIComponent(id.trim())}`);
+      const res = await fetch(`/api/clinic/data?clinicId=${encodeURIComponent(id.trim())}`, {
+        signal: controller.signal,
+      });
       if (!res.ok) {
         throw new Error(`Failed to fetch clinic data: ${res.status}`);
       }
@@ -54,18 +62,40 @@ export default function DemandGenPanel({ onToast }: DemandGenPanelProps) {
         throw new Error(json.error || "Failed to fetch clinic data");
       }
     } catch (err) {
+      if (err instanceof Error && err.name === "AbortError") {
+        console.log("Fetch request aborted.");
+        return;
+      }
       console.error(err);
       setError(err instanceof Error ? err.message : "An error occurred");
       onToast("Error fetching clinic insights");
     } finally {
-      setLoading(false);
+      if (abortControllerRef.current === controller) {
+        setLoading(false);
+        abortControllerRef.current = null;
+      }
     }
   }, [onToast]);
 
   useEffect(() => {
-    loadClinicData(clinicId);
+    if (clinicId.trim()) {
+      loadClinicData(clinicId);
+    }
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
   }, [clinicId, loadClinicData]);
 
+  const handleCancel = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+      onToast("Fetch cancelled by user");
+    }
+    setLoading(false);
+  };
   const handleFetch = (e: React.FormEvent) => {
     e.preventDefault();
     if (clinicIdInput.trim()) {
@@ -125,7 +155,7 @@ export default function DemandGenPanel({ onToast }: DemandGenPanelProps) {
                     fontWeight: 600
                   }}
                 >
-                  Reset to Demo Clinic
+                  {clinicIdInput ? "Reset to Demo Clinic" : "Load Demo Clinic"}
                 </button>
               )}
             </div>
@@ -146,15 +176,24 @@ export default function DemandGenPanel({ onToast }: DemandGenPanelProps) {
             />
           </div>
           <button
-            type="submit"
+            type={loading ? "button" : "submit"}
             className="generate-btn"
-            disabled={loading}
-            style={{ height: "42px", padding: "0 22px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12.5px" }}
+            onClick={loading ? handleCancel : undefined}
+            style={{
+              height: "42px",
+              padding: "0 22px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "12.5px",
+              background: loading ? "var(--red)" : undefined,
+              borderColor: loading ? "var(--red)" : undefined,
+            }}
           >
             {loading ? (
               <>
                 <span className="spinner" style={{ marginRight: "8px" }} />
-                Fetching...
+                Stop Fetching
               </>
             ) : (
               <>⚡ Fetch Insights</>
@@ -162,6 +201,30 @@ export default function DemandGenPanel({ onToast }: DemandGenPanelProps) {
           </button>
         </form>
       </div>
+
+      {/* ── EMPTY / PROMPT STATE ── */}
+      {!data && !loading && !error && (
+        <div className="card" style={{ textAlign: "center", padding: "60px 24px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "16px" }}>
+          <div style={{ fontSize: "40px" }}>📊</div>
+          <div style={{ fontSize: "16px", fontWeight: 700, color: "var(--text)" }}>
+            No Active Clinic Loaded
+          </div>
+          <div style={{ fontSize: "13.5px", color: "var(--text-muted)", maxWidth: "480px", lineHeight: "1.6" }}>
+            Enter a Practo Clinic Configuration ID above and click <strong>Fetch Insights</strong> to analyze live market signals and local competitor benchmarking.
+          </div>
+          <button
+            type="button"
+            className="generate-btn"
+            onClick={() => {
+              setClinicIdInput("c9d8655e-90c2-42f1-9ab8-f5cc214e8aea");
+              setClinicId("c9d8655e-90c2-42f1-9ab8-f5cc214e8aea");
+            }}
+            style={{ fontSize: "12px", padding: "8px 18px", background: "rgba(124, 77, 255, 0.08)", border: "1px solid rgba(124, 77, 255, 0.2)", color: "var(--purple-text)", boxShadow: "none" }}
+          >
+            Use Demo Clinic ID
+          </button>
+        </div>
+      )}
 
       {/* ── LOADING STATE ── */}
       {loading && (
@@ -369,7 +432,9 @@ export default function DemandGenPanel({ onToast }: DemandGenPanelProps) {
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", flexWrap: "wrap", gap: "12px" }}>
                   <div>
                     <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>Target Locality</div>
-                    <div style={{ fontSize: "15px", fontWeight: 700, color: "var(--text)" }}>{data.clinic.locality || "Koramangala"}</div>
+                    <div style={{ fontSize: "15px", fontWeight: 700, color: "var(--text)", textTransform: "capitalize" }}>
+                      {data.competitors.top_competitors[0]?.locality || data.clinic.locality || "Koramangala"}
+                    </div>
                   </div>
                   <div style={{ textAlign: "right" }}>
                     <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>Total Competitor Clinics</div>
@@ -412,9 +477,11 @@ export default function DemandGenPanel({ onToast }: DemandGenPanelProps) {
                           </div>
                         </div>
                         <div style={{ textAlign: "right" }}>
-                          <div style={{ fontWeight: 700, color: "var(--text)" }}>{comp.review_count} Reviews</div>
-                          <div style={{ fontSize: "11px", color: "var(--green-text)", fontWeight: 600 }}>
-                            {comp.conversion}% Conv
+                          <div style={{ fontWeight: 700, color: "var(--text)" }}>
+                            {comp.specialty_txns !== undefined ? comp.specialty_txns : comp.monetisable_txns} Dental Txns
+                          </div>
+                          <div style={{ fontSize: "11px", color: "var(--text-muted)", fontWeight: 600 }}>
+                            {comp.is_heuristic ? "Estimated" : "Real Breakout"} &middot; {comp.monetisable_txns} overall
                           </div>
                         </div>
                       </div>
@@ -437,7 +504,11 @@ export default function DemandGenPanel({ onToast }: DemandGenPanelProps) {
                           <div className="channel-card-name">{meta.name}</div>
                           <div className="channel-card-desc">{meta.desc}</div>
                           <div className="channel-card-bookings" style={{ color: CHANNEL_COLORS[key] }}>
-                            {val.bookings} booking{val.bookings !== 1 ? "s" : ""}
+                            {key === "practo_listing" && typeof data.our_monetisable_txns === "number" && data.our_monetisable_txns > 0 ? (
+                              `${data.our_monetisable_txns} transaction${data.our_monetisable_txns !== 1 ? "s" : ""}`
+                            ) : (
+                              `${val.bookings} booking${val.bookings !== 1 ? "s" : ""}`
+                            )}
                           </div>
                         </div>
                       );
@@ -558,13 +629,15 @@ export default function DemandGenPanel({ onToast }: DemandGenPanelProps) {
                         borderRadius: "12px",
                         position: "relative"
                       }}>
-                        {isCurrentLocality && (
-                          <span className="pill" style={{ position: "absolute", top: "10px", right: "14px", fontSize: "8px", background: "var(--purple-mid)", color: "var(--purple-text)", textTransform: "uppercase", padding: "2px 6px" }}>
-                            Current
-                          </span>
-                        )}
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                          <span style={{ fontWeight: 800, color: isCurrentLocality ? "var(--purple-text)" : "var(--text)", fontSize: "12.5px" }}>{loc.name}</span>
+                          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                            <span style={{ fontWeight: 800, color: isCurrentLocality ? "var(--purple-text)" : "var(--text)", fontSize: "12.5px" }}>{loc.name}</span>
+                            {isCurrentLocality && (
+                              <span className="pill" style={{ fontSize: "8px", background: "var(--purple-mid)", color: "var(--purple-text)", textTransform: "uppercase", padding: "2px 6px" }}>
+                                Current
+                              </span>
+                            )}
+                          </div>
                           <span style={{ fontWeight: 700, color: "var(--text-2)", fontSize: "12px" }}>{loc.monthly_dental_searches} searches</span>
                         </div>
                         <div style={{ fontSize: "10.5px", color: "var(--text-muted)" }}>

@@ -6,8 +6,9 @@ export const config = {
   ringai: {
     apiKey: process.env.RINGG_API_KEY || "",
     baseUrl: "https://prod-api.ringg.ai/ca/api/v0",
-    inboundAgentId: "35b9bb7d-c4ea-45eb-95c6-cc31f83e008f",
-    outboundAgentId: "60c6b2d5-46ca-4b4f-975a-c31f23cf8c3d",
+    inboundAgentId: "4d03f9cd-320b-49bf-adbb-cbe8fdde9c59",
+    inboundNumber: "+918031137408",
+    outboundAgentId: "35b9bb7d-c4ea-45eb-95c6-cc31f83e008f",
     fromNumberId: "ffc7dd03-3a4d-46ef-9aab-5aba0699ad36",
     fromNumber: "+912268095634",
   },
