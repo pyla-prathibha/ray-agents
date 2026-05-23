@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useRef } from "react";
 import { INBOUND_DIALOGUE, INBOUND_EVENTS, RECENT_CALLS } from "@/agents/inbound/data";
 
 interface InboundPanelProps {
@@ -13,11 +13,6 @@ interface TimelineEvent {
   time: string;
   status: string;
   statusColor: "muted" | "blue" | "green";
-}
-
-interface ChatMessage {
-  sender: "ai" | "patient";
-  text: string;
 }
 
 function makeInitialEvents(): TimelineEvent[] {
@@ -44,9 +39,6 @@ export default function InboundPanel({ onToast }: InboundPanelProps) {
   const [callTimer, setCallTimer] = useState("00:00");
   const [showTimer, setShowTimer] = useState(false);
   const [events, setEvents] = useState<TimelineEvent[]>(makeInitialEvents);
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
-  const [showTyping, setShowTyping] = useState(false);
-  const [waveActive, setWaveActive] = useState(false);
   const [debugLines, setDebugLines] = useState<string[]>([]);
   const [debugActive, setDebugActive] = useState(false);
   const [debugStatus, setDebugStatus] = useState<"IDLE" | "ACTIVE" | "COMPLETE">("IDLE");
@@ -55,13 +47,6 @@ export default function InboundPanel({ onToast }: InboundPanelProps) {
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const abortRef = useRef(false);
-  const chatEndRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (chatMessages.length > 0 || showTyping) {
-      chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [chatMessages, showTyping]);
 
   const addDebug = useCallback((line: string) => {
     setDebugLines((prev) => [...prev, line]);
@@ -106,9 +91,6 @@ export default function InboundPanel({ onToast }: InboundPanelProps) {
 
     setCallActive(true);
     setCallStatus({ label: "Connecting...", color: "var(--blue)" });
-    setChatMessages([]);
-    setShowTyping(false);
-    setWaveActive(false);
     setEvents(makeInitialEvents());
     setDebugLines([]);
     setDebugActive(true);
@@ -143,38 +125,10 @@ export default function InboundPanel({ onToast }: InboundPanelProps) {
           const showBubble = delay + 2000;
           const waveOff = showBubble + 3500;
 
-          schedule(() => {
-            if (abortRef.current) return;
-            setShowTyping(true);
-            setWaveActive(true);
-          }, typingStart);
-
-          schedule(() => {
-            if (abortRef.current) return;
-            setShowTyping(false);
-            setChatMessages((prev) => [...prev, { sender: "ai", text: line.text }]);
-          }, showBubble);
-
-          schedule(() => {
-            if (abortRef.current) return;
-            setWaveActive(false);
-          }, waveOff);
-
           delay = waveOff + 500;
         } else {
           const showBubble = delay + 1500;
           const waveOff = showBubble + 2500;
-
-          schedule(() => {
-            if (abortRef.current) return;
-            setWaveActive(true);
-            setChatMessages((prev) => [...prev, { sender: "patient", text: line.text }]);
-          }, showBubble);
-
-          schedule(() => {
-            if (abortRef.current) return;
-            setWaveActive(false);
-          }, waveOff);
 
           delay = waveOff + 500;
         }
@@ -314,10 +268,10 @@ export default function InboundPanel({ onToast }: InboundPanelProps) {
         </div>
       </div>
 
-      {/* ── Row 2 · Dial + Chat ── */}
-      <div className="grid-2">
+      {/* ── Row 2 · Dial Card (Full Width) ── */}
+      <div>
         {/* Dial Card */}
-        <div className="glow-card dial-card">
+        <div className="glow-card dial-card" style={{ width: "100%" }}>
           <div className="glow-card-inner">
             <div className="dial-label dial-label-blue">
               <span className="card-title-dot" style={{ background: "var(--blue)" }} />
@@ -340,51 +294,6 @@ export default function InboundPanel({ onToast }: InboundPanelProps) {
               <code className="code-blue">/api/webhook/inbound</code>{" "}
               with transcript &amp; booking data.
             </div>
-          </div>
-        </div>
-
-        {/* Waveform + Chat Card */}
-        <div className="card">
-          <div className="card-title">
-            <span className="card-title-dot" style={{ background: "var(--blue)" }} />
-            Live Call Transcript
-          </div>
-
-          {/* Waveform */}
-          <div className={`waveform-container${waveActive ? " active" : ""}`}>
-            <span className="waveform-label">Waveform</span>
-            {Array.from({ length: 35 }, (_, i) => (
-              <div key={i} className="wave-bar" />
-            ))}
-          </div>
-
-          {/* Chat */}
-          <div className="chat-window">
-            {chatMessages.length === 0 && !showTyping && (
-              <div className="chat-placeholder">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 0 1-.923 1.785A5.969 5.969 0 0 0 6 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337Z" />
-                </svg>
-                Trigger a call to see the live transcript
-              </div>
-            )}
-
-            {chatMessages.map((msg, i) => (
-              <div key={i} className={`chat-bubble ${msg.sender === "ai" ? "ai" : "patient"}`}>
-                <span className="sender">{msg.sender === "ai" ? "Ray AI" : "Patient"}</span>
-                {msg.text}
-              </div>
-            ))}
-
-            {showTyping && (
-              <div className="chat-bubble ai">
-                <span className="sender">Ray AI</span>
-                <div className="typing-indicator">
-                  <span /><span /><span />
-                </div>
-              </div>
-            )}
-            <div ref={chatEndRef} />
           </div>
         </div>
       </div>

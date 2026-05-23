@@ -26,7 +26,7 @@ export function WebhookDebugger({
       <div className="debugger-header">
         <div className="flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-[0.1em] text-[#94a3b8]">
           <div className={`debugger-dot ${active ? "active" : ""}`} />
-          Claude API Webhook Receiver Logger
+          Webhook Debugger
         </div>
         <span className="text-[9.5px] text-[#64748b] font-bold font-mono">
           STATUS: {status}

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useCallback, useRef } from "react";
-import type { ChatMessage } from "@/components/shared/ChatSimulator";
 import { WebhookDebugger } from "@/components/shared/WebhookDebugger";
 import type { TimelineEvent } from "@/components/shared/EventTimeline";
 import {
@@ -50,9 +49,6 @@ export default function OutboundPanel({ onToast }: OutboundPanelProps) {
   const [showTimer, setShowTimer] = useState(false);
 
   const [events, setEvents] = useState<TimelineEvent[]>(INITIAL_EVENTS);
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
-  const [showTyping, setShowTyping] = useState(false);
-  const [waveActive, setWaveActive] = useState(false);
 
   const [debugLines, setDebugLines] = useState<string[]>([]);
   const [debugActive, setDebugActive] = useState(false);
@@ -109,23 +105,12 @@ export default function OutboundPanel({ onToast }: OutboundPanelProps) {
 
             if (eventType === "call_started") {
               setCallStatus("Connected");
-              setWaveActive(true);
             }
 
             if (eventType === "call_completed") {
               setCallStatus(ev.sub_status === "VOICEMAIL_DETECTED" ? "Voicemail" : "Completed");
-              setWaveActive(false);
-
-              // Show transcript if available
-              if (ev.transcript && ev.transcript.length > 0) {
-                const msgs = ev.transcript.map((turn: Record<string, string>) => ({
-                  sender: turn.bot ? ("ai" as const) : ("patient" as const),
-                  text: turn.bot || turn.user || "",
-                }));
-                setChatMessages(msgs);
-              }
             }
-
+ 
             if (eventType === "all_processing_completed") {
               addDebug(
                 `<span style="color:#10b981">[${ts()}]</span> <span style="color:#64748b">--- Platform analysis ---</span>`
@@ -187,13 +172,11 @@ export default function OutboundPanel({ onToast }: OutboundPanelProps) {
     }
 
     // Reset state
-    setChatMessages([]);
     setEvents([...INITIAL_EVENTS]);
     setDebugLines([]);
     setCallTimer(0);
     setShowTimer(true);
     setCallActive(true);
-    setWaveActive(false);
     setDebugActive(true);
     setDebugStatus("ACTIVE");
     setCallStatus("Initiating...");
@@ -294,10 +277,9 @@ export default function OutboundPanel({ onToast }: OutboundPanelProps) {
         </div>
       </div>
 
-      {/* ── Row 2: Trigger + Chat ── */}
-      <div className="grid-2">
-        {/* Left: Trigger Form */}
-        <div className="glow-card dial-card-green">
+      {/* ── Row 2: Trigger Form (Full Width) ── */}
+      <div>
+        <div className="glow-card dial-card-green" style={{ width: "100%" }}>
           <div className="glow-card-inner">
             <div className="dial-label dial-label-green">
               📤 Trigger Outbound Post OPD Call
@@ -356,42 +338,6 @@ export default function OutboundPanel({ onToast }: OutboundPanelProps) {
               <code className="code-green">POST</code>{" "}
               <code className="code-green">/api/outbound/trigger</code>
             </div>
-          </div>
-        </div>
-
-        {/* Right: Waveform + Chat */}
-        <div className="card">
-          <div className="card-title">
-            <span className="card-title-dot" style={{ background: "var(--green)" }} />
-            Live Call Simulation
-            {showTimer && (
-              <span style={{ marginLeft: "auto", fontFamily: "monospace", fontSize: 11, color: "var(--green-text)" }}>
-                {formatTime(callTimer)}
-              </span>
-            )}
-          </div>
-          <div className={`waveform-container green${waveActive ? " active" : ""}`}>
-            {Array.from({ length: 35 }).map((_, i) => (
-              <div key={i} className="wave-bar" />
-            ))}
-          </div>
-          <div className="chat-window">
-            {chatMessages.map((msg, i) => (
-              <div key={i} className={`chat-bubble ${msg.sender === "ai" ? "ai green" : "patient green"}`}>
-                <span className="sender">{msg.sender === "ai" ? "Ray AI" : "Patient"}</span>
-                {msg.text}
-              </div>
-            ))}
-            {showTyping && (
-              <div className="chat-bubble ai green">
-                <span className="sender">Ray AI</span>
-                <span className="typing-indicator">
-                  <span />
-                  <span />
-                  <span />
-                </span>
-              </div>
-            )}
           </div>
         </div>
       </div>
