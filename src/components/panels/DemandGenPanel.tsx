@@ -6,6 +6,31 @@ interface DemandGenPanelProps {
   onToast: (msg: string) => void;
 }
 
+function hashClinicName(name: string): string {
+  const words = name.split(/\s+/);
+  const maskedWords = words.map((w) => {
+    const lower = w.toLowerCase();
+    if (["and", "n", "of", "the", "&", "or"].includes(lower)) {
+      return lower;
+    }
+    if (w.length <= 3) {
+      return w[0] + "•".repeat(w.length - 1);
+    }
+    return w.substring(0, 2) + "•".repeat(w.length - 2);
+  });
+  return maskedWords.join(" ");
+}
+
+function getClinicHash(name: string): string {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    const char = name.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash |= 0;
+  }
+  return Math.abs(hash).toString(16).toUpperCase().substring(0, 4);
+}
+
 const CHANNEL_META: Record<string, { icon: string; name: string; desc: string }> = {
   practo_listing: { icon: "📋", name: "Practo Listing", desc: "Photos · FAQ · auto-bid" },
   google_business: { icon: "📍", name: "Google Business", desc: "Posts · review replies" },
@@ -532,48 +557,191 @@ export default function DemandGenPanel({ onToast }: DemandGenPanelProps) {
                   </div>
                 </div>
 
-                {data.competitors.top_competitors.length === 0 ? (
-                  <div style={{ textAlign: "center", padding: "16px", color: "var(--text-muted)", fontSize: "13px" }}>
-                    No local competitors found in transaction registry.
-                  </div>
-                ) : (
-                  <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                    {data.competitors.top_competitors.map((comp) => (
-                      <div key={comp.rank} className="channel-card" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 18px" }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                          <div style={{
-                            width: "28px",
-                            height: "28px",
-                            borderRadius: "50%",
-                            background: comp.rank === 1 ? "var(--orange-mid)" : comp.rank === 2 ? "var(--blue-mid)" : "var(--surface-3)",
-                            color: comp.rank === 1 ? "var(--orange-text)" : comp.rank === 2 ? "var(--blue-text)" : "var(--text-muted)",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            fontWeight: "bold",
-                            fontSize: "12px"
-                          }}>
-                            #{comp.rank}
-                          </div>
-                          <div>
-                            <div style={{ fontWeight: 700, color: "var(--text)", fontSize: "13.5px" }}>{comp.practice_name}</div>
-                            <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>
-                              Lead: {comp.doctor_name} &middot; {comp.experience} exp
+                <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                  {(() => {
+                    const topCompetitors = data.competitors.top_competitors || [];
+                    const items = topCompetitors.map((comp) => ({
+                      ...comp,
+                      isOurClinic: false,
+                    }));
+
+                    const ourRank = data.competitors.our_clinic_rank;
+                    const ourTxns = data.competitors.our_clinic_txns ?? data.our_monetisable_txns ?? 0;
+
+                    if (ourRank && ourTxns !== undefined) {
+                      if (!items.some(item => item.isOurClinic)) {
+                        items.push({
+                          rank: ourRank,
+                          practice_name: data.clinic.name,
+                          doctor_name: "",
+                          locality: data.clinic.locality || "",
+                          speciality: "General Dentistry",
+                          experience: "Active Clinic Insights",
+                          review_count: 0,
+                          monetisable_txns: ourTxns,
+                          specialty_txns: ourTxns,
+                          is_heuristic: false,
+                          conversion: 100,
+                          isOurClinic: true,
+                        });
+                      }
+                    }
+
+                    // Sort by rank ascending
+                    items.sort((a, b) => a.rank - b.rank);
+
+                    return items.map((item, idx) => {
+                      if (item.isOurClinic) {
+                        return (
+                          <div
+                            key={`our-clinic-${idx}`}
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "space-between",
+                              padding: "16px 20px",
+                              background: "rgba(124, 77, 255, 0.12)",
+                              border: "2px solid var(--purple)",
+                              borderRadius: "16px",
+                              boxShadow: "0 0 16px rgba(124, 77, 255, 0.2), var(--shadow-glow-purple)",
+                              transition: "all 0.3s ease",
+                              position: "relative",
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.transform = "translateY(-2px)";
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.transform = "translateY(0)";
+                            }}
+                          >
+                            <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+                              {/* Gold Gradient Rank Badge */}
+                              <div
+                                style={{
+                                  width: "32px",
+                                  height: "32px",
+                                  borderRadius: "50%",
+                                  background: "linear-gradient(135deg, #fbbf24, #f59e0b)",
+                                  color: "#ffffff",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  fontWeight: 800,
+                                  fontSize: "13px",
+                                  boxShadow: "0 2px 6px rgba(245, 158, 11, 0.3)",
+                                  flexShrink: 0,
+                                }}
+                              >
+                                #{item.rank}
+                              </div>
+                              <div>
+                                <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                                  <span style={{ fontWeight: 800, color: "var(--text)", fontSize: "14px" }}>
+                                    {item.practice_name}
+                                  </span>
+                                  <span
+                                    className="pill"
+                                    style={{
+                                      background: "linear-gradient(135deg, var(--purple-deep), var(--purple))",
+                                      color: "#ffffff",
+                                      fontSize: "8.5px",
+                                      padding: "2px 8px",
+                                      border: "none",
+                                      fontWeight: 800,
+                                    }}
+                                  >
+                                    OUR CLINIC
+                                  </span>
+                                </div>
+                                <div style={{ fontSize: "12px", color: "var(--purple-text)", fontWeight: 600, marginTop: "2px" }}>
+                                  Active Clinic Insights
+                                </div>
+                              </div>
+                            </div>
+                            <div style={{ textAlign: "right" }}>
+                              <div style={{ fontSize: "16px", fontWeight: 800, color: "var(--purple-text)", fontFamily: "var(--font-mono)", display: "flex", alignItems: "baseline", justifyContent: "flex-end", gap: "2px" }}>
+                                {item.specialty_txns || item.monetisable_txns}
+                              </div>
+                              <div style={{ fontSize: "10px", color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.04em" }}>txns</div>
                             </div>
                           </div>
-                        </div>
-                        <div style={{ textAlign: "right" }}>
-                          <div style={{ fontWeight: 700, color: "var(--text)" }}>
-                            {comp.specialty_txns !== undefined ? comp.specialty_txns : comp.monetisable_txns} Dental Txns
+                        );
+                      } else {
+                        return (
+                          <div
+                            key={`competitor-${idx}`}
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "space-between",
+                              padding: "14px 20px",
+                              background: "var(--surface-2)",
+                              border: "1px solid var(--border)",
+                              borderRadius: "16px",
+                              transition: "all 0.3s ease",
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.transform = "translateY(-1px)";
+                              e.currentTarget.style.borderColor = "var(--border-2)";
+                              e.currentTarget.style.background = "var(--surface-3)";
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.transform = "translateY(0)";
+                              e.currentTarget.style.borderColor = "var(--border)";
+                              e.currentTarget.style.background = "var(--surface-2)";
+                            }}
+                          >
+                            <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+                              {/* Default Rank Badge */}
+                              <div
+                                style={{
+                                  width: "32px",
+                                  height: "32px",
+                                  borderRadius: "50%",
+                                  background: "var(--surface-3)",
+                                  border: "1px solid var(--border-2)",
+                                  color: "var(--text-muted)",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  fontWeight: 700,
+                                  fontSize: "12px",
+                                  flexShrink: 0,
+                                }}
+                              >
+                                #{item.rank}
+                              </div>
+                              <div>
+                                <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                                  <span style={{ fontWeight: 700, color: "var(--text)", fontSize: "13.5px" }}>
+                                    {hashClinicName(item.practice_name)}
+                                  </span>
+                                  <span style={{ fontSize: "10.5px", color: "var(--text-muted)", fontFamily: "var(--font-mono)", opacity: 0.8 }}>
+                                    (Clinic #{getClinicHash(item.practice_name)})
+                                  </span>
+                                </div>
+                                <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "2px" }}>
+                                  {item.experience} experience
+                                </div>
+                              </div>
+                            </div>
+                            <div style={{ textAlign: "right" }}>
+                              <div style={{ fontSize: "15px", fontWeight: 700, color: "var(--text)", fontFamily: "var(--font-mono)", display: "flex", alignItems: "baseline", justifyContent: "flex-end", gap: "2px" }}>
+                                {item.specialty_txns || item.monetisable_txns}
+                                {item.is_heuristic && (
+                                  <span style={{ fontSize: "10px", color: "var(--text-muted)", fontWeight: 500, marginLeft: "2px" }} title="Heuristic breakout estimation">
+                                    *
+                                  </span>
+                                )}
+                              </div>
+                              <div style={{ fontSize: "10px", color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.04em" }}>txns</div>
+                            </div>
                           </div>
-                          <div style={{ fontSize: "11px", color: "var(--text-muted)", fontWeight: 600 }}>
-                            {comp.is_heuristic ? "Estimated" : "Real Breakout"} &middot; {comp.monetisable_txns} overall
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                        );
+                      }
+                    });
+                  })()}
+                </div>
               </div>
 
 

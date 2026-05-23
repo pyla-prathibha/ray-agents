@@ -39,18 +39,11 @@ export default function InboundPanel({ onToast }: InboundPanelProps) {
   const [callTimer, setCallTimer] = useState("00:00");
   const [showTimer, setShowTimer] = useState(false);
   const [events, setEvents] = useState<TimelineEvent[]>(makeInitialEvents);
-  const [debugLines, setDebugLines] = useState<string[]>([]);
-  const [debugActive, setDebugActive] = useState(false);
-  const [debugStatus, setDebugStatus] = useState<"IDLE" | "ACTIVE" | "COMPLETE">("IDLE");
   const [recentCalls, setRecentCalls] = useState([...RECENT_CALLS]);
   const [stats, setStats] = useState({ calls: 18, responded: 14, booked: 9, pending: 2 });
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const abortRef = useRef(false);
-
-  const addDebug = useCallback((line: string) => {
-    setDebugLines((prev) => [...prev, line]);
-  }, []);
 
   const fireEvent = useCallback(
     (index: number, dot: "blue" | "green", statusLabel: string, statusColor: "blue" | "green") => {
@@ -92,9 +85,6 @@ export default function InboundPanel({ onToast }: InboundPanelProps) {
     setCallActive(true);
     setCallStatus({ label: "Connecting...", color: "var(--blue)" });
     setEvents(makeInitialEvents());
-    setDebugLines([]);
-    setDebugActive(true);
-    setDebugStatus("ACTIVE");
 
     const timeouts: ReturnType<typeof setTimeout>[] = [];
     const schedule = (fn: () => void, ms: number) => {
@@ -105,18 +95,12 @@ export default function InboundPanel({ onToast }: InboundPanelProps) {
       if (abortRef.current) return;
       fireEvent(0, "blue", "Fired", "blue");
       setCallStatus({ label: "Ringing", color: "var(--blue)" });
-      addDebug(
-        `<span style="color:var(--blue)">[${ts()}]</span> <span style="color:var(--blue-text)">POST</span> /webhook/inbound → <b>call_started</b> ring_group=reception`
-      );
     }, 1000);
 
     schedule(() => {
       if (abortRef.current) return;
       setCallStatus({ label: "Connected", color: "var(--green-text)" });
       startTimer();
-      addDebug(
-        `<span style="color:var(--green)">[${ts()}]</span> <span style="color:var(--green-text)">CONNECTED</span> stream_id=strm_${Math.random().toString(36).slice(2, 8)}`
-      );
 
       let delay = 0;
       INBOUND_DIALOGUE.forEach((line) => {
@@ -141,41 +125,13 @@ export default function InboundPanel({ onToast }: InboundPanelProps) {
         setCallActive(false);
 
         fireEvent(1, "green", "Fired", "green");
-        addDebug(
-          `<span style="color:var(--green)">[${ts()}]</span> <span style="color:var(--green-text)">POST</span> /webhook/inbound → <b>call_completed</b> duration=3m14s`
-        );
 
         schedule(() => {
           fireEvent(2, "green", "Fired", "green");
-          addDebug(
-            `<span style="color:var(--green)">[${ts()}]</span> <span style="color:var(--green-text)">POST</span> /webhook/inbound → <b>recording_completed</b> size=1.4MB`
-          );
         }, 800);
 
         schedule(() => {
           fireEvent(3, "green", "Fired", "green");
-          addDebug(
-            `<span style="color:var(--green)">[${ts()}]</span> <span style="color:var(--green-text)">POST</span> /webhook/inbound → <b>all_processing_completed</b>`
-          );
-          addDebug("");
-          addDebug(
-            `<span style="color:var(--blue-text)">[Claude Extraction]</span> <span style="color:var(--text-secondary)">` +
-              JSON.stringify(
-                {
-                  intent: "appointment_booking",
-                  doctor: "Dr. Victor Mag",
-                  slot: "Sat May 23, 10:30 AM",
-                  patient_phone: `+91 ${phone}`,
-                  confidence: 0.97,
-                },
-                null,
-                2
-              ).replace(/\n/g, "<br/>") +
-              `</span>`
-          );
-
-          setDebugActive(false);
-          setDebugStatus("COMPLETE");
 
           setRecentCalls((prev) => [
             {
@@ -209,7 +165,7 @@ export default function InboundPanel({ onToast }: InboundPanelProps) {
       timeouts.forEach(clearTimeout);
       stopTimer();
     };
-  }, [phone, onToast, fireEvent, addDebug, startTimer, stopTimer]);
+  }, [phone, onToast, fireEvent, startTimer, stopTimer]);
 
   const pillClass = (status: string) => {
     if (status === "Booked" || status === "Done") return "pill pill-booked";
@@ -298,10 +254,10 @@ export default function InboundPanel({ onToast }: InboundPanelProps) {
         </div>
       </div>
 
-      {/* ── Row 3 · Timeline + Debugger ── */}
-      <div className="grid-2">
+      {/* ── Row 3 · Timeline (Full Width) ── */}
+      <div>
         {/* Event Timeline */}
-        <div className="card">
+        <div className="card" style={{ width: "100%" }}>
           <div className="card-title">
             <span className="card-title-dot" style={{ background: "var(--blue)" }} />
             Webhook Event Timeline
@@ -316,27 +272,6 @@ export default function InboundPanel({ onToast }: InboundPanelProps) {
                   {ev.status}
                 </span>
               </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Debugger */}
-        <div className="card debugger-card">
-          <div className="debugger-header">
-            <div className="debugger-title">
-              <span className={`debugger-dot${debugActive ? " active" : ""}`} />
-              Webhook Debugger
-            </div>
-            <span style={{ fontSize: 10, fontWeight: 700, color: debugStatus === "ACTIVE" ? "#38bdf8" : debugStatus === "COMPLETE" ? "#6ee7b7" : "#64748b", textTransform: "uppercase", letterSpacing: "0.08em" }}>
-              {debugStatus}
-            </span>
-          </div>
-          <div className="debugger-body">
-            {debugLines.length === 0 && (
-              <span style={{ color: "#64748b" }}>Waiting for webhook events...</span>
-            )}
-            {debugLines.map((line, i) => (
-              <div key={i} dangerouslySetInnerHTML={{ __html: line || "&nbsp;" }} />
             ))}
           </div>
         </div>

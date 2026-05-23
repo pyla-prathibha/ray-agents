@@ -22,6 +22,8 @@ export interface CompetitorSummary {
   total_clinics_in_radius: number;
   avg_rating: number;
   top_competitors: Competitor[];
+  our_clinic_rank?: number;
+  our_clinic_txns?: number;
 }
 
 import searchTrends from "@/data/metrics/search_trends.json";
@@ -132,6 +134,7 @@ You must return ONLY valid JSON (no markdown, no code fences) matching this exac
     "whatsapp_broadcasts": { "bookings": number, "pct": number }
   },
   "content_published": [
+    // You MUST always generate exactly 5 items in this array (no more, no less)
     { "type": string, "title": string, "metric": string, "badge": "video" | "post" | "carousel" }
   ],
   "platforms": {
@@ -144,7 +147,7 @@ You must return ONLY valid JSON (no markdown, no code fences) matching this exac
   "growth_report_narrative": string
 }
 
-Base your analysis on real data provided. Generate realistic bookings and channel attribution numbers derived from the doctor's monthly case volume and local search demand. The narrative must be 2-3 high-value analytical sentences.`;
+Base your analysis on real data provided. Generate realistic bookings and channel attribution numbers derived from the doctor's monthly case volume and local search demand. The narrative must be 2-3 high-value analytical sentences. You MUST always generate exactly 5 auto-published content pieces under "content_published".`;
 
 export interface ClinicDashboardData {
   clinic: PractoEstablishment;
@@ -194,6 +197,8 @@ function getFallbackReport(): DemandGenReport {
       { type: "Video Short · 32 Sec", title: "\"How CAD/CAM dental crowns are made in 1 day\"", metric: "Auto-clipped · 4.2K views", badge: "video" },
       { type: "Google Post", title: "\"Why laser root canals are virtually pain-free\"", metric: "Auto-written · 78 saves", badge: "post" },
       { type: "Meta Carousel", title: "\"Rahul's Invisalign smile journey at Koramangala\"", metric: "Attributed · CTR +34%", badge: "carousel" },
+      { type: "Video Short · 45 Sec", title: "\"The truth about dental implant pain — patient review\"", metric: "Auto-clipped · 8.9K views", badge: "video" },
+      { type: "Google Post", title: "\"Understanding Invisalign vs traditional metal braces\"", metric: "Auto-written · 142 saves", badge: "post" },
     ],
     platforms: {
       practo_optimization: "Optimize auto-bids for 'root canal treatment Koramangala' (1,400 monthly searches). Highlight CAD/CAM digital crowns and laser dentistry in listing photos. Add FAQ entries for 'dental implant cost' and 'invisalign duration'. Set consultation fee at ₹100 to undercut competitors averaging ₹70.",
@@ -297,6 +302,33 @@ export async function fetchClinicData(clinicId: string): Promise<ClinicDashboard
           const ourResolved = getSpecialtyTxns(matched.practice_id, matched.monetisable_txns, matched.speciality, targetSpec);
           our_monetisable_txns = ourResolved.txns;
 
+          // Calculate our clinic's rank in the entire zone list
+          const allZonePractices = csvRows.filter(r => {
+            if (r.zone.trim().toLowerCase() !== targetZone) return false;
+            const specialties = r.speciality.split(";").map(s => s.trim().toLowerCase());
+            return specialties.includes(targetSpec.toLowerCase());
+          });
+
+          if (!allZonePractices.some(r => r.practice_id === matched.practice_id)) {
+            allZonePractices.push(matched);
+          }
+
+          const practicesWithTxns = allZonePractices.map(r => {
+            const resolved = getSpecialtyTxns(r.practice_id, r.monetisable_txns, r.speciality, targetSpec);
+            return {
+              practice_id: r.practice_id,
+              txns: resolved.txns,
+              overall: r.monetisable_txns
+            };
+          });
+
+          practicesWithTxns.sort((a, b) => {
+            if (b.txns !== a.txns) return b.txns - a.txns;
+            return b.overall - a.overall;
+          });
+
+          const ourRank = practicesWithTxns.findIndex(p => p.practice_id === matched.practice_id) + 1;
+
           // Find competitors in same zone with speciality 'General Dentistry' (or contains it) excluding our own practice_id
           const dentalCompetitors = csvRows.filter(r => {
             if (r.zone.trim().toLowerCase() !== targetZone) return false;
@@ -332,9 +364,11 @@ export async function fetchClinicData(clinicId: string): Promise<ClinicDashboard
           });
 
           competitors = {
-            total_clinics_in_radius: top3.length, // Show only top 3 clinics as requested by user
+            total_clinics_in_radius: allZonePractices.length, 
             avg_rating: 4.8,
             top_competitors: top3,
+            our_clinic_rank: ourRank,
+            our_clinic_txns: our_monetisable_txns,
           };
           csvResolved = true;
         }
@@ -432,9 +466,11 @@ export async function fetchClinicData(clinicId: string): Promise<ClinicDashboard
     ];
 
     competitors = {
-      total_clinics_in_radius: 3,
+      total_clinics_in_radius: 4,
       avg_rating: 4.7,
       top_competitors: fallbackCompetitors,
+      our_clinic_rank: 4,
+      our_clinic_txns: 65,
     };
   }
 

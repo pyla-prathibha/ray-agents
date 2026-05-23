@@ -13,9 +13,11 @@ export const CHANNELS = [
 ];
 
 export const CONTENT_PUBLISHED = [
-  { type: "Video Short · 32 Sec", title: "\"3 things to know before your PRP session\"", metric: "Auto-clipped · 4.2K views", badge: "video" },
-  { type: "Google Post", title: "\"Why outcomes differ between PRP and mesotherapy\"", metric: "Auto-written · 78 saves", badge: "post" },
-  { type: "Meta Carousel", title: "\"Anjali's hair transplant journey · 4 months\"", metric: "Anonymised · CTR +34%", badge: "carousel" },
+  { type: "Video Short · 32 Sec", title: "\"How CAD/CAM dental crowns are made in 1 day\"", metric: "Auto-clipped · 4.2K views", badge: "video" },
+  { type: "Google Post", title: "\"Why laser root canals are virtually pain-free\"", metric: "Auto-written · 78 saves", badge: "post" },
+  { type: "Meta Carousel", title: "\"Rahul's Invisalign smile journey at Koramangala\"", metric: "Attributed · CTR +34%", badge: "carousel" },
+  { type: "Video Short · 45 Sec", title: "\"The truth about dental implant pain — patient review\"", metric: "Auto-clipped · 8.9K views", badge: "video" },
+  { type: "Google Post", title: "\"Understanding Invisalign vs traditional metal braces\"", metric: "Auto-written · 142 saves", badge: "post" },
 ];
 
 export const WHY_DOCTORS = [

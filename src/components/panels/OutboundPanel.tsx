@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useCallback, useRef } from "react";
-import { WebhookDebugger } from "@/components/shared/WebhookDebugger";
 import type { TimelineEvent } from "@/components/shared/EventTimeline";
 import {
   buildOutboundDialogue,
@@ -50,20 +49,12 @@ export default function OutboundPanel({ onToast }: OutboundPanelProps) {
 
   const [events, setEvents] = useState<TimelineEvent[]>(INITIAL_EVENTS);
 
-  const [debugLines, setDebugLines] = useState<string[]>([]);
-  const [debugActive, setDebugActive] = useState(false);
-  const [debugStatus, setDebugStatus] = useState<"IDLE" | "ACTIVE" | "COMPLETE">("IDLE");
-
   const [queuePatients, setQueuePatients] = useState([...QUEUE_PATIENTS]);
   const [stats, setStats] = useState({ opdConsults: 1240, followedUp: 142, booked: 68 });
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const ts = () => new Date().toLocaleTimeString("en-IN", { hour12: false });
-
-  const addDebug = useCallback((line: string) => {
-    setDebugLines((prev) => [...prev, line]);
-  }, []);
 
   const updateEvent = useCallback(
     (index: number, dot: TimelineEvent["dot"], status: string, statusColor: TimelineEvent["statusColor"]) => {
@@ -95,10 +86,6 @@ export default function OutboundPanel({ onToast }: OutboundPanelProps) {
             const eventType = ev.event_type;
             const eventIdx = INITIAL_EVENTS.findIndex((e) => e.name === eventType);
 
-            addDebug(
-              `<span style="color:#10b981">[${ev.timestamp?.slice(11, 19) || ts()}]</span> <span style="color:#94a3b8">WEBHOOK</span> ${eventType}${ev.status ? ` | status: ${ev.status}` : ""}${ev.sub_status ? ` | sub_status: ${ev.sub_status}` : ""}`
-            );
-
             if (eventIdx !== -1) {
               updateEvent(eventIdx, "green", "RECEIVED", "green");
             }
@@ -109,28 +96,6 @@ export default function OutboundPanel({ onToast }: OutboundPanelProps) {
 
             if (eventType === "call_completed") {
               setCallStatus(ev.sub_status === "VOICEMAIL_DETECTED" ? "Voicemail" : "Completed");
-            }
- 
-            if (eventType === "all_processing_completed") {
-              addDebug(
-                `<span style="color:#10b981">[${ts()}]</span> <span style="color:#64748b">--- Platform analysis ---</span>`
-              );
-              if (ev.platform_analysis) {
-                addDebug(
-                  `<span style="color:#34d399">${JSON.stringify(ev.platform_analysis, null, 2).replace(/\n/g, "<br/>")}</span>`
-                );
-              }
-            }
-
-            if (eventType === "claude_analysis_completed" && ev.claude_analysis) {
-              addDebug(
-                `<span style="color:#10b981">[${ts()}]</span> <span style="color:#64748b">--- Claude analysis ---</span>`
-              );
-              addDebug(
-                `<span style="color:#34d399">${JSON.stringify(ev.claude_analysis, null, 2).replace(/\n/g, "<br/>")}</span>`
-              );
-              setDebugStatus("COMPLETE");
-              setDebugActive(false);
             }
           }
           lastEventCount = events.length;
@@ -155,7 +120,7 @@ export default function OutboundPanel({ onToast }: OutboundPanelProps) {
 
       return pollInterval;
     },
-    [addDebug, updateEvent]
+    [updateEvent]
   );
 
   const triggerOutboundCall = useCallback(async () => {
@@ -173,25 +138,15 @@ export default function OutboundPanel({ onToast }: OutboundPanelProps) {
 
     // Reset state
     setEvents([...INITIAL_EVENTS]);
-    setDebugLines([]);
     setCallTimer(0);
     setShowTimer(true);
     setCallActive(true);
-    setDebugActive(true);
-    setDebugStatus("ACTIVE");
     setCallStatus("Initiating...");
 
     // Start timer
     timerRef.current = setInterval(() => {
       setCallTimer((t) => t + 1);
     }, 1000);
-
-    addDebug(
-      `<span style="color:#10b981">[${ts()}]</span> Initiating outbound call via RingAI API...`
-    );
-    addDebug(
-      `<span style="color:#10b981">[${ts()}]</span> patient: ${name} | phone: +91${ph.replace(/\D/g, "")} | doctor: ${doctor}`
-    );
 
     try {
       const res = await fetch("/api/calls/outbound", {
@@ -209,9 +164,6 @@ export default function OutboundPanel({ onToast }: OutboundPanelProps) {
       const data = await res.json();
 
       if (data.success && data.call_id) {
-        addDebug(
-          `<span style="color:#10b981">[${ts()}]</span> <span style="color:#34d399">Call initiated!</span> call_id: <span style="color:#c4b5fd">${data.call_id}</span>`
-        );
         setCallStatus("Ringing...");
         updateEvent(0, "green", "INITIATED", "green");
 
@@ -227,20 +179,15 @@ export default function OutboundPanel({ onToast }: OutboundPanelProps) {
       }
     } catch (error) {
       const msg = error instanceof Error ? error.message : "Unknown error";
-      addDebug(
-        `<span style="color:#f87171">[${ts()}]</span> ERROR: ${msg}`
-      );
       setCallStatus("Failed");
       setCallActive(false);
-      setDebugActive(false);
-      setDebugStatus("IDLE");
       if (timerRef.current) {
         clearInterval(timerRef.current);
         timerRef.current = null;
       }
       onToast(`Call failed: ${msg}`);
     }
-  }, [callActive, patientName, doctorName, specialty, phone, addDebug, updateEvent, onToast, pollCallEvents]);
+  }, [callActive, patientName, doctorName, specialty, phone, updateEvent, onToast, pollCallEvents]);
 
   const formatTime = (s: number) =>
     `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
@@ -342,9 +289,9 @@ export default function OutboundPanel({ onToast }: OutboundPanelProps) {
         </div>
       </div>
 
-      {/* ── Row 3: Timeline + Debugger ── */}
-      <div className="grid-2">
-        <div className="card">
+      {/* ── Row 3: Event Timeline (Full Width) ── */}
+      <div>
+        <div className="card" style={{ width: "100%" }}>
           <div className="card-title">
             <span className="card-title-dot" style={{ background: "var(--green)" }} />
             Event Timeline
@@ -373,7 +320,6 @@ export default function OutboundPanel({ onToast }: OutboundPanelProps) {
             ))}
           </div>
         </div>
-        <WebhookDebugger lines={debugLines} active={debugActive} status={debugStatus} />
       </div>
 
       {/* ── Row 4: Calling From + Stats ── */}
