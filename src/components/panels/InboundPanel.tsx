@@ -244,12 +244,6 @@ export default function InboundPanel({ onToast }: InboundPanelProps) {
                 Ray AI handles the conversation automatically.
               </div>
             </div>
-
-            <div className="webhook-note">
-              Incoming calls trigger webhooks on{" "}
-              <code className="code-blue">/api/webhook/inbound</code>{" "}
-              with transcript &amp; booking data.
-            </div>
           </div>
         </div>
       </div>

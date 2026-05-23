@@ -279,12 +279,6 @@ export default function OutboundPanel({ onToast }: OutboundPanelProps) {
             >
               {callActive ? `Call Active · ${formatTime(callTimer)}` : "Trigger Outbound Call"}
             </button>
-
-            <div className="webhook-note">
-              Webhook endpoint:{" "}
-              <code className="code-green">POST</code>{" "}
-              <code className="code-green">/api/outbound/trigger</code>
-            </div>
           </div>
         </div>
       </div>
@@ -354,37 +348,10 @@ export default function OutboundPanel({ onToast }: OutboundPanelProps) {
         </div>
       </div>
 
-      {/* ── Row 5: Parameters + Queue ── */}
-      <div className="grid-2">
-        {/* Left: Input Parameters */}
-        <div className="card">
-          <div className="card-title">
-            <span className="card-title-dot" style={{ background: "var(--green)" }} />
-            Input Parameters · Per Call
-          </div>
-
-          {/* System Params */}
-          <div className="param-group-label">System Parameters</div>
-          {SYSTEM_PARAMS.map((p) => (
-            <div key={p} className="param-item param-item-system">
-              <code>{p}</code>
-              <span style={{ fontSize: 9, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.05em", background: "var(--green)", color: "#fff", padding: "2px 8px", borderRadius: 6 }}>
-                auto
-              </span>
-            </div>
-          ))}
-
-          {/* Custom Params */}
-          <div className="param-group-label" style={{ marginTop: 20 }}>Custom Parameters</div>
-          {CUSTOM_PARAMS.map((p) => (
-            <div key={p} className="param-item param-item-custom">
-              <code>{p}</code>
-            </div>
-          ))}
-        </div>
-
-        {/* Right: Follow-Up Queue */}
-        <div className="card">
+      {/* ── Row 5: Queue ── */}
+      <div>
+        {/* Follow-Up Queue */}
+        <div className="card" style={{ width: "100%" }}>
           <div className="card-title">
             <span className="card-title-dot" style={{ background: "var(--green)" }} />
             Post Booking Queue · This Month

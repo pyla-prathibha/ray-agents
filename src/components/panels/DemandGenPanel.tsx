@@ -389,7 +389,7 @@ export default function DemandGenPanel({ onToast }: DemandGenPanelProps) {
                 </div>
                 <div className="metric-card cyan">
                   <div className="metric-label">Local Competitors</div>
-                  <div className="metric-val cyan">{competitorCount}</div>
+                  <div className="metric-val cyan">{Math.max(0, competitorCount - 1)}</div>
                   <div className="metric-delta delta-dn">↓ In {data.clinic.locality || "Koramangala"}</div>
                 </div>
               </div>
@@ -553,7 +553,9 @@ export default function DemandGenPanel({ onToast }: DemandGenPanelProps) {
                   </div>
                   <div style={{ textAlign: "right" }}>
                     <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>Total Competitor Clinics</div>
-                    <div style={{ fontSize: "15px", fontWeight: 700, color: "var(--red-text)" }}>{data.competitors.total_clinics_in_radius} Clinics</div>
+                    <div style={{ fontSize: "15px", fontWeight: 700, color: "var(--red-text)" }}>
+                      {Math.max(0, data.competitors.total_clinics_in_radius - 1)} Clinics
+                    </div>
                   </div>
                 </div>
 
@@ -653,9 +655,6 @@ export default function DemandGenPanel({ onToast }: DemandGenPanelProps) {
                                     OUR CLINIC
                                   </span>
                                 </div>
-                                <div style={{ fontSize: "12px", color: "var(--purple-text)", fontWeight: 600, marginTop: "2px" }}>
-                                  Active Clinic Insights
-                                </div>
                               </div>
                             </div>
                             <div style={{ textAlign: "right" }}>
@@ -719,9 +718,6 @@ export default function DemandGenPanel({ onToast }: DemandGenPanelProps) {
                                   <span style={{ fontSize: "10.5px", color: "var(--text-muted)", fontFamily: "var(--font-mono)", opacity: 0.8 }}>
                                     (Clinic #{getClinicHash(item.practice_name)})
                                   </span>
-                                </div>
-                                <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "2px" }}>
-                                  {item.experience} experience
                                 </div>
                               </div>
                             </div>
