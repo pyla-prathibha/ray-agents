@@ -162,6 +162,8 @@ export default function DemandGenPanel({ onToast }: DemandGenPanelProps) {
     }
   };
 
+  // Scenario playground handler removed
+
   const report = data?.report;
   const ch = report?.channels;
 
@@ -259,6 +261,8 @@ export default function DemandGenPanel({ onToast }: DemandGenPanelProps) {
             )}
           </button>
         </form>
+
+        {/* Scenario playgrounds removed */}
       </div>
 
       {/* ── EMPTY / PROMPT STATE ── */}
@@ -413,15 +417,42 @@ export default function DemandGenPanel({ onToast }: DemandGenPanelProps) {
                               </td>
                               <td>
                                 <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
-                                  {doc.qualifications.map((q, i) => (
-                                    <span key={i} className="pill" style={{ background: "var(--surface-3)", color: "var(--text-2)", textTransform: "none", letterSpacing: 0, padding: "2px 6px" }}>
-                                      {q}
-                                    </span>
-                                  ))}
+                                  {doc.qualifications.map((q, i) => {
+                                    const isSpecialist = q.toUpperCase().includes("MDS") || 
+                                                        q.toUpperCase().includes("DNB") || 
+                                                        q.toUpperCase().includes("MS") || 
+                                                        q.toUpperCase().includes("PHD") ||
+                                                        q.toUpperCase().includes("FELLOW");
+                                    const isCore = q.toUpperCase().includes("BDS");
+                                    
+                                    const badgeClass = isSpecialist 
+                                      ? "pill badge-degree-specialist" 
+                                      : isCore 
+                                        ? "pill badge-degree-core" 
+                                        : "pill";
+                                        
+                                    return (
+                                      <span key={i} className={badgeClass} style={(!isSpecialist && !isCore) ? { background: "var(--surface-3)", color: "var(--text-2)", textTransform: "none", letterSpacing: 0, padding: "2px 6px" } : undefined}>
+                                        {q}
+                                      </span>
+                                    );
+                                  })}
                                 </div>
                               </td>
                               <td>
-                                <span style={{ fontWeight: 600 }}>{doc.experience}</span>
+                                <div style={{ display: "flex", flexDirection: "column", gap: "4px", minWidth: "120px" }}>
+                                  <span style={{ fontWeight: 600, fontSize: "12.5px" }}>{doc.experience}</span>
+                                  {(() => {
+                                    const parsed = parseInt(doc.experience.replace(/[^0-9]/g, ""), 10);
+                                    const expYears = isNaN(parsed) ? 15 : parsed;
+                                    const expPct = Math.min(100, Math.max(5, (expYears / 30) * 100));
+                                    return (
+                                      <div className="exp-track-wrap" title={`${expYears} years / 30-year career track`}>
+                                        <div className="exp-track-progress" style={{ width: `${expPct}%` }} />
+                                      </div>
+                                    );
+                                  })()}
+                                </div>
                               </td>
                               <td>
                                 <span style={{ fontWeight: 600, color: "var(--green-text)" }}>
@@ -499,10 +530,6 @@ export default function DemandGenPanel({ onToast }: DemandGenPanelProps) {
                     <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>Total Competitor Clinics</div>
                     <div style={{ fontSize: "15px", fontWeight: 700, color: "var(--red-text)" }}>{data.competitors.total_clinics_in_radius} Clinics</div>
                   </div>
-                  <div style={{ textAlign: "right" }}>
-                    <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>Avg Competitor NPS</div>
-                    <div style={{ fontSize: "15px", fontWeight: 700, color: "var(--orange-text)" }}>★ {data.competitors.avg_rating} / 5</div>
-                  </div>
                 </div>
 
                 {data.competitors.top_competitors.length === 0 ? (
@@ -549,96 +576,12 @@ export default function DemandGenPanel({ onToast }: DemandGenPanelProps) {
                 )}
               </div>
 
-              {/* 5 CHANNELS */}
-              <div>
-                <div className="section-label">5 Channels Managed For You</div>
-                <div className="grid-5">
-                  {ch &&
-                    Object.entries(ch).map(([key, val]) => {
-                      const meta = CHANNEL_META[key];
-                      if (!meta) return null;
-                      const baseline = (data?.our_monetisable_txns && data.our_monetisable_txns > 0) ? data.our_monetisable_txns : 271;
-                      const metrics = getChannelMetrics(key, baseline);
-                      return (
-                        <div key={key} className="channel-card" style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-                          <div>
-                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                              <div className="channel-card-icon">{meta.icon}</div>
-                              <span className="pill" style={{
-                                fontSize: "8.5px",
-                                background: metrics.lift === "NEW" ? "var(--purple-light)" : "var(--green-light)",
-                                color: metrics.lift === "NEW" ? "var(--purple-text)" : "var(--green-text)",
-                                border: `1px solid ${metrics.lift === "NEW" ? "var(--purple-mid)" : "var(--green-mid)"}`,
-                                padding: "2px 6px",
-                                fontWeight: 800
-                              }}>
-                                {metrics.lift}
-                              </span>
-                            </div>
-                            <div className="channel-card-name">{meta.name}</div>
-                            <div className="channel-card-desc" style={{ marginBottom: "12px", minHeight: "26px" }}>{meta.desc}</div>
-                          </div>
 
-                          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px", borderTop: "1px solid var(--border)", paddingTop: "10px", marginTop: "auto" }}>
-                            <div style={{ background: "var(--surface-2)", padding: "6px 8px", borderRadius: "10px", border: "1px solid var(--border)", display: "flex", flexDirection: "column", gap: "2px" }}>
-                              <span style={{ fontSize: "8px", color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.02em" }}>{metrics.currentLabel}</span>
-                              <span style={{ fontSize: "13px", fontWeight: 800, color: "var(--text-muted)", fontFamily: "var(--font-mono)" }}>{metrics.current}</span>
-                              <span style={{ fontSize: "8px", color: "var(--text-muted)", opacity: 0.8 }}>{metrics.unit}</span>
-                            </div>
-                            <div style={{ background: "var(--green-light)", padding: "6px 8px", borderRadius: "10px", border: "1px solid var(--green-mid)", display: "flex", flexDirection: "column", gap: "2px" }}>
-                              <span style={{ fontSize: "8px", color: "var(--green-text)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.02em" }}>{metrics.projectedLabel}</span>
-                              <span style={{ fontSize: "13px", fontWeight: 800, color: CHANNEL_COLORS[key], fontFamily: "var(--font-mono)" }}>{metrics.projected}</span>
-                              <span style={{ fontSize: "8px", color: "var(--text-muted)", opacity: 0.8 }}>{metrics.unit}</span>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                </div>
-              </div>
 
-              {/* CONTENT AUTO-PUBLISHED */}
-              <div>
-                <div className="section-label">Content Auto-Published This Month</div>
-                <div className="grid-3">
-                  {report?.content_published.map((item, idx) => (
-                    <div key={idx} className="content-tile">
-                      <span className={`content-tile-badge ${BADGE_CLASS[item.badge] || ""}`}>{item.type}</span>
-                      <div className="content-tile-body">
-                        <div className="content-tile-title">{item.title}</div>
-                      </div>
-                      <div className="content-tile-footer">
-                        <span>{item.metric}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* CLAUDE NARRATIVE */}
-              {report?.growth_report_narrative && (
-                <div className="glow-card narrative-box">
-                  <div className="glow-card-inner">
-                    <div className="narrative-header">✨ Ray AI Analysis Playbook</div>
-                    <p className="narrative-text">{report.growth_report_narrative}</p>
-                  </div>
-                </div>
-              )}
             </div>
 
             {/* RIGHT COLUMN */}
             <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-              {/* WHAT YOU GET */}
-              <div className="value-card-highlight">
-                <div style={{ fontSize: "10px", fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "8px", opacity: 0.85 }}>What You Get</div>
-                <div className="value-card-highlight-val">+20&ndash;40%</div>
-                <div className="value-card-highlight-sub">
-                  New patient appointments every month &mdash; at <strong>2&ndash;3&times; the ROI</strong> of a typical marketing agency.
-                </div>
-              </div>
-
-
-
               {/* DENTIST SEARCH TRENDS */}
               <div className="card">
                 <div className="card-title">
@@ -659,18 +602,23 @@ export default function DemandGenPanel({ onToast }: DemandGenPanelProps) {
                     </div>
                   </div>
                 </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: "8px", maxHeight: "180px", overflowY: "auto", paddingRight: "4px" }}>
-                  {data.searchTrends.top_keywords.slice(0, 5).map((k, i) => (
-                    <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "8px 12px", background: "var(--surface-2)", borderRadius: "10px", fontSize: "11.5px" }}>
-                      <span style={{ fontWeight: 600, color: "var(--text)" }}>{k.keyword}</span>
-                      <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-                        <span className="pill" style={{ fontSize: "8px", background: "var(--blue-light)", color: "var(--blue-text)", border: "1px solid var(--blue-mid)", textTransform: "none", padding: "2px 6px" }}>
-                          {k.intent}
-                        </span>
-                        <span style={{ fontWeight: 700, color: "var(--text-2)" }}>{k.monthly_searches}</span>
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px", height: "220px", overflowY: "auto", paddingRight: "4px" }}>
+                  {data.searchTrends.top_keywords.map((k, i) => {
+                    const maxSearches = Math.max(...data.searchTrends.top_keywords.map(kw => kw.monthly_searches));
+                    const relativePct = maxSearches > 0 ? (k.monthly_searches / maxSearches) * 100 : 0;
+                    return (
+                      <div key={i} className="trend-item" style={{ position: "relative", overflow: "hidden", flexShrink: 0 }}>
+                        <div className="trend-item-bar" style={{ width: `${relativePct}%` }} />
+                        <span style={{ fontWeight: 600, color: "var(--text)", position: "relative", zIndex: 2 }}>{k.keyword}</span>
+                        <div style={{ display: "flex", gap: "8px", alignItems: "center", position: "relative", zIndex: 2 }}>
+                          <span className="pill" style={{ fontSize: "8px", background: "var(--blue-light)", color: "var(--blue-text)", border: "1px solid var(--blue-mid)", textTransform: "none", padding: "2px 6px" }}>
+                            {k.intent}
+                          </span>
+                          <span style={{ fontWeight: 700, color: "var(--text-2)" }}>{k.monthly_searches}</span>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
 
@@ -680,20 +628,11 @@ export default function DemandGenPanel({ onToast }: DemandGenPanelProps) {
                   <span className="card-title-dot" style={{ background: "var(--green)" }} />
                   Locality Breakdowns
                 </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: "8px", maxHeight: "240px", overflowY: "auto", paddingRight: "4px" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px", height: "220px", overflowY: "auto", paddingRight: "4px" }}>
                   {data.geoIntent.localities.map((loc, i) => {
                     const isCurrentLocality = loc.name.toLowerCase() === (data.clinic.locality || "koramangala").toLowerCase();
                     return (
-                      <div key={i} style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: "4px",
-                        padding: "10px 14px",
-                        background: isCurrentLocality ? "var(--purple-light)" : "var(--surface-2)",
-                        border: isCurrentLocality ? "1px solid var(--purple-mid)" : "1px solid transparent",
-                        borderRadius: "12px",
-                        position: "relative"
-                      }}>
+                      <div key={i} className={`locality-item ${isCurrentLocality ? "current-locality" : ""}`} style={{ flexShrink: 0 }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                             <span style={{ fontWeight: 800, color: isCurrentLocality ? "var(--purple-text)" : "var(--text)", fontSize: "12.5px" }}>{loc.name}</span>
@@ -717,28 +656,124 @@ export default function DemandGenPanel({ onToast }: DemandGenPanelProps) {
                 </div>
               </div>
 
-              {/* WHY DOCTORS LOVE IT */}
-              <div className="value-card">
-                <div className="section-label">Why Doctors Love It</div>
-                {WHY_DOCTORS.map((item, idx) => (
-                  <div key={idx} className="why-item">
-                    <div className="why-icon">{item.icon}</div>
-                    <div>
-                      <div className="why-title">{item.title}</div>
-                      <div className="why-desc">{item.desc}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
 
-              <div style={{ display: "flex", justifyContent: "center" }}>
-                <div className="status-live" style={{ fontSize: "12px" }}>
-                  <div className="pulse" />
-                  Connected &middot; Active
-                </div>
-              </div>
             </div>
           </div>
+
+          {/* 5 CHANNELS */}
+          <div>
+            <div className="section-label">5 Channels Managed For You</div>
+            <div className="grid-5">
+              {ch &&
+                Object.entries(ch).map(([key, val]) => {
+                  const meta = CHANNEL_META[key];
+                  if (!meta) return null;
+                  const baseline = (data?.our_monetisable_txns && data.our_monetisable_txns > 0) ? data.our_monetisable_txns : 271;
+                  const metrics = getChannelMetrics(key, baseline);
+                  const isNew = metrics.lift === "NEW";
+                  const ratio = isNew ? 0 : (metrics.projected > 0 ? (metrics.current / metrics.projected) * 100 : 100);
+                  const liftColor = CHANNEL_COLORS[key] || "var(--purple)";
+                  return (
+                    <div key={key} className="channel-card" style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                      <div>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                          <div className="channel-card-icon">{meta.icon}</div>
+                          <span className="pill badge-ai-boost" style={{
+                            background: metrics.lift === "NEW" ? "var(--purple-light)" : "var(--green-light)",
+                            color: metrics.lift === "NEW" ? "var(--purple-text)" : "var(--green-text)",
+                            border: `1px solid ${metrics.lift === "NEW" ? "var(--purple-mid)" : "var(--green-mid)"}`,
+                          }}>
+                            <span className="badge-pulse-dot" style={{ color: metrics.lift === "NEW" ? "var(--purple)" : "var(--green)" }} />
+                            {metrics.lift}
+                          </span>
+                        </div>
+                        <div className="channel-card-name">{meta.name}</div>
+                        <div className="channel-card-desc" style={{ marginBottom: "8px", minHeight: "26px" }}>{meta.desc}</div>
+                      </div>
+
+                      {/* Dynamic Visual Lift Tracker */}
+                      <div className="lift-tracker-wrap">
+                        <div className="lift-tracker-base" style={{ width: `${ratio}%` }} />
+                        <div 
+                          className="lift-tracker-lift" 
+                          style={{ 
+                            left: `${ratio}%`, 
+                            width: `${100 - ratio}%`,
+                            background: `linear-gradient(90deg, ${liftColor} 0%, var(--purple-light) 120%)`,
+                            boxShadow: `0 0 6px ${liftColor}`
+                          }} 
+                        />
+                      </div>
+
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px", borderTop: "1px solid var(--border)", paddingTop: "10px", marginTop: "auto" }}>
+                        <div style={{ background: "var(--surface-2)", padding: "6px 8px", borderRadius: "10px", border: "1px solid var(--border)", display: "flex", flexDirection: "column", gap: "2px" }}>
+                          <span style={{ fontSize: "8px", color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.02em" }}>{metrics.currentLabel}</span>
+                          <span style={{ fontSize: "13px", fontWeight: 800, color: "var(--text-muted)", fontFamily: "var(--font-mono)" }}>{metrics.current}</span>
+                          <span style={{ fontSize: "8px", color: "var(--text-muted)", opacity: 0.8 }}>{metrics.unit}</span>
+                        </div>
+                        <div style={{ background: "var(--green-light)", padding: "6px 8px", borderRadius: "10px", border: "1px solid var(--green-mid)", display: "flex", flexDirection: "column", gap: "2px" }}>
+                          <span style={{ fontSize: "8px", color: "var(--green-text)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.02em" }}>{metrics.projectedLabel}</span>
+                          <span style={{ fontSize: "13px", fontWeight: 800, color: CHANNEL_COLORS[key], fontFamily: "var(--font-mono)" }}>{metrics.projected}</span>
+                          <span style={{ fontSize: "8px", color: "var(--text-muted)", opacity: 0.8 }}>{metrics.unit}</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>
+          </div>
+
+          {/* CONTENT AUTO-PUBLISHED */}
+          <div>
+            <div className="section-label">Content Auto-Published This Month</div>
+            <div className="grid-5">
+              {report?.content_published.map((item, idx) => {
+                const isVideo = item.badge === "video";
+                let platformName = "Instagram";
+                let platformClass = "platform-instagram";
+                
+                if (item.badge === "video") {
+                  platformName = "YouTube";
+                  platformClass = "platform-youtube";
+                } else if (item.badge === "post") {
+                  platformName = "Google Maps";
+                  platformClass = "platform-gmaps";
+                }
+                
+                return (
+                  <div key={idx} className="content-tile" style={{ position: "relative", overflow: "hidden" }}>
+                    <span className={`content-tile-badge ${BADGE_CLASS[item.badge] || ""}`}>{item.type}</span>
+                    
+                    {isVideo && (
+                      <div className="content-tile-play-overlay">
+                        <div className="play-btn-circle">▶</div>
+                      </div>
+                    )}
+                    
+                    <div className="content-tile-body" style={{ position: "relative", zIndex: 2 }}>
+                      <div className="content-tile-title">{item.title}</div>
+                    </div>
+                    <div className="content-tile-footer" style={{ position: "relative", zIndex: 2 }}>
+                      <span>{item.metric}</span>
+                      <span className={`pill ${platformClass}`} style={{ fontSize: "8.5px", padding: "2px 6px", textTransform: "none", letterSpacing: 0 }}>
+                        {platformName}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* CLAUDE NARRATIVE */}
+          {report?.growth_report_narrative && (
+            <div className="glow-card narrative-box">
+              <div className="glow-card-inner">
+                <div className="narrative-header">✨ Ray AI Analysis Playbook</div>
+                <p className="narrative-text">{report.growth_report_narrative}</p>
+              </div>
+            </div>
+          )}
         </>
       )}
     </div>

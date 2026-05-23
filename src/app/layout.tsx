@@ -16,7 +16,7 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: "Ray · AI Agent Command Centre",
-  description: "Ray AI Practice Growth Engine - 3 Agents, 1 Service, RingAI Webhooks, Claude SDK",
+  description: "Ray AI Practice Growth Engine - 4 Agents, 1 Service, RingAI Webhooks, Claude SDK",
 };
 
 export default function RootLayout({

@@ -32,7 +32,7 @@ export function Topbar({ clock, theme, onToggleTheme }: TopbarProps) {
         <div className="env-badge">Production</div>
         <div className="status-live">
           <div className="pulse" />
-          3 Agents Live
+          4 Agents Live
         </div>
         <div className="time-badge">{clock}</div>
       </div>

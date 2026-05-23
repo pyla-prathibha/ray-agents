@@ -9,8 +9,8 @@ interface SidebarProps {
 
 const NAV_ITEMS: { id: Panel; icon: string; title: string; meta: string; badge: string; badgeClass: string; agent: string }[] = [
   { id: "inbound", icon: "📞", title: "Apt Booking · Inbound", meta: "Patient booking calls", badge: "Live", badgeClass: "badge-blue", agent: "inbound" },
-  { id: "outbound", icon: "📤", title: "Post Booking · Outbound", meta: "Post-booking follow-ups", badge: "Active", badgeClass: "badge-green", agent: "outbound" },
-  { id: "reactivation", icon: "🔄", title: "Reactivation · Outbound", meta: "Dormant patient calls", badge: "Active", badgeClass: "badge-green", agent: "outbound" },
+  { id: "outbound", icon: "📤", title: "Post Booking · Outbound", meta: "Post-booking follow-ups", badge: "Live", badgeClass: "badge-green", agent: "outbound" },
+  { id: "reactivation", icon: "🔄", title: "Reactivation · Outbound", meta: "Dormant patient calls", badge: "Live", badgeClass: "badge-green", agent: "outbound" },
   { id: "demand", icon: "📊", title: "Demand Gen · Report", meta: "Monthly growth metrics", badge: "May", badgeClass: "badge-purple", agent: "demand" },
 ];
 
@@ -35,25 +35,10 @@ export function Sidebar({ activePanel, onSwitch }: SidebarProps) {
         </button>
       ))}
 
-      <div className="sidebar-label">Platform</div>
-      <div className="sidebar-section">
-        <div className="env-card">
-          <div className="env-card-label">AI Model</div>
-          <div className="env-card-val">Claude Sonnet 4.6</div>
-        </div>
-        <div className="env-card">
-          <div className="env-card-label">Voice Provider</div>
-          <div className="env-card-val">Ray AI Voice Engine</div>
-        </div>
-        <div className="env-card">
-          <div className="env-card-label">Booking Engine</div>
-          <div className="env-card-val" style={{ color: "var(--blue-text)", fontWeight: 600 }}>Ray · Practo</div>
-        </div>
-      </div>
 
       <div className="sidebar-footer">
         <div className="sf-label">Powered By</div>
-        <div className="sf-id">Ray · Practo AI Agents</div>
+        <div className="sf-id">Practo · Ray AI Agents</div>
       </div>
     </nav>
   );
