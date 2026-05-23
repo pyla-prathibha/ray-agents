@@ -346,10 +346,11 @@ export async function fetchClinicData(clinicId: string): Promise<ClinicDashboard
             return b.monetisable_txns - a.monetisable_txns;
           });
           
-          const top3 = dentalCompetitors.slice(0, 3).map((item, idx) => {
+          const top3 = dentalCompetitors.slice(0, 3).map((item) => {
             const resolved = getSpecialtyTxns(item.practice_id, item.monetisable_txns, item.speciality, targetSpec);
+            const compRank = practicesWithTxns.findIndex(p => p.practice_id === item.practice_id) + 1;
             return {
-              rank: idx + 1,
+              rank: compRank || 2,
               practice_name: item.practice_name || "Unknown Practice",
               doctor_name: "Lead Practitioner",
               locality: item.zone || targetZone,
