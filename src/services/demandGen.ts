@@ -497,9 +497,9 @@ export async function fetchClinicData(clinicId: string): Promise<ClinicDashboard
   console.log(`[DemandGen] Starting Claude analysis for clinicId=${clinicId} elapsed=${Date.now() - overallStart}ms`);
   let report: DemandGenReport | null = null;
   const token = config.anthropic.oauthToken;
+  const claudeStart = Date.now();
   if (token) {
     try {
-      const claudeStart = Date.now();
       const doctorSignal = doctors.length > 0 ? {
         lead_doctor_name: doctors[0].name,
         doctor_specialty: doctors[0].speciality,
