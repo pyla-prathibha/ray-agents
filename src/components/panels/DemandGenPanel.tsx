@@ -44,10 +44,10 @@ const BADGE_CLASS: Record<string, string> = {
 };
 
 const LOADING_STEPS = [
-  { id: 1, title: "Establishing Practo Bridge", description: "Connecting to securely bridge establishment details..." },
-  { id: 2, title: "Mapping Lead Practitioners", description: "Resolving active practices and matching lead practitioners..." },
-  { id: 3, title: "Analyzing Local Competitors", description: "Parsing and benchmarking local competitor transaction records..." },
-  { id: 4, title: "Synthesizing Growth Insights", description: "Executing Ray AI growth narrative reasoning engine..." },
+  { id: 1, title: "Practo bridge connection", description: "Connecting to securely bridge establishment details..." },
+  { id: 2, title: "Doctor registry mapping", description: "Resolving active practices and matching lead practitioners..." },
+  { id: 3, title: "CSV competitor telemetry ingestion", description: "Parsing and benchmarking local competitor transaction records..." },
+  { id: 4, title: "Ray AI Analysing", description: "Executing Ray AI growth narrative reasoning engine..." },
 ];
 
 const getChannelMetrics = (key: string, baseline: number) => {
@@ -325,185 +325,312 @@ export default function DemandGenPanel({ onToast }: DemandGenPanelProps) {
       {/* ── LOADING STATE ── */}
       {loading && (
         <div className="card" style={{ 
-          padding: "48px 32px", 
+          padding: "40px 32px", 
           position: "relative", 
           overflow: "hidden",
-          border: "1px solid rgba(124, 77, 255, 0.15)",
-          boxShadow: "0 8px 32px rgba(15, 23, 42, 0.45)",
-          background: "linear-gradient(135deg, rgba(12, 15, 23, 0.95), rgba(24, 18, 48, 0.95))",
-          borderRadius: "20px"
+          boxShadow: "none"
         }}>
-          {/* Moving laser scan overlay */}
-          <div className="diagnostic-scan-overlay" style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
+          {/* Saas-style Top Control Bar */}
+          <div style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
             width: "100%",
-            height: "4px",
-            background: "linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.3) 20%, rgba(124, 77, 255, 0.6) 50%, rgba(6, 182, 212, 0.3) 80%, transparent)",
-            boxShadow: "0 0 12px rgba(124, 77, 255, 0.5)",
-            animation: "laserScan 4s linear infinite",
-            pointerEvents: "none",
-            zIndex: 1
-          }} />
-          
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "24px" }}>
-            {/* High-tech radial loader */}
-            <div className="loader-ring-wrapper" style={{
-              position: "relative",
-              width: "64px",
-              height: "64px",
-              borderRadius: "50%",
-              background: "conic-gradient(from 0deg, transparent 30%, var(--purple) 70%, var(--cyan) 100%)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              animation: "spinLoader 1.5s linear infinite",
-              boxShadow: "0 0 20px rgba(124, 77, 255, 0.25)"
-            }}>
-              <div className="loader-ring-inner" style={{
-                width: "56px",
-                height: "56px",
+            borderBottom: "1px solid rgba(255,255,255,0.08)",
+            paddingBottom: "18px",
+            marginBottom: "32px"
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <span style={{
+                display: "inline-block",
+                width: "8px",
+                height: "8px",
                 borderRadius: "50%",
-                background: "#0f121d",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "var(--text)",
-                animation: "counterSpin 1.5s linear infinite",
-                boxShadow: "inset 0 0 10px rgba(124, 77, 255, 0.15)"
+                background: "var(--purple)",
+                boxShadow: "0 0 8px var(--purple)",
+                animation: "indicatorPulse 1.5s ease-in-out infinite alternate"
+              }} />
+              <span style={{
+                fontFamily: "'JetBrains Mono', monospace",
+                fontSize: "11px",
+                fontWeight: 700,
+                color: "var(--purple-text)",
+                letterSpacing: "0.12em",
+                textTransform: "uppercase"
               }}>
-                <span style={{ fontSize: "24px", animation: "indicatorPulse 1.5s ease-in-out infinite alternate" }}>⚡</span>
-              </div>
+                agent is running
+              </span>
             </div>
+            <div style={{
+              fontFamily: "'JetBrains Mono', monospace",
+              fontSize: "10.5px",
+              color: "var(--text-muted)",
+              letterSpacing: "0.05em"
+            }}>
+              STATUS: <span style={{ color: "var(--purple-text)", fontWeight: 700 }}>RUNNING</span>
+            </div>
+          </div>
+          
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "32px" }}>
             
-            <div style={{ textAlign: "center", maxWidth: "480px" }}>
-              <h3 style={{ fontSize: "16px", fontWeight: 800, color: "var(--text)", marginBottom: "6px" }}>
-                Synthesizing Clinic Demand Insights
+            <div style={{ textAlign: "center", maxWidth: "600px", marginBottom: "8px" }}>
+              <h3 style={{ fontSize: "20px", fontWeight: 700, color: "var(--text)", marginBottom: "12px", letterSpacing: "-0.02em" }}>
+                {loadingStep === 1 && "Establishing Practo bridge connection"}
+                {loadingStep === 2 && "Mapping doctor registry data"}
+                {loadingStep === 3 && "Ingesting CSV competitor telemetry"}
+                {loadingStep === 4 && "Ray AI Analysing"}
               </h3>
-              <p style={{ fontSize: "12px", color: "var(--text-muted)", lineHeight: 1.5 }}>
-                Ray is parsing geo-intel search databases, competitor metrics, and running Claude playbooks in real time.
+              <p style={{ fontSize: "14px", color: "var(--text-muted)", lineHeight: 1.6, maxWidth: "480px", margin: "0 auto" }}>
+                {loadingStep === 1 && "Connecting to securely bridge Practo establishment and database details."}
+                {loadingStep === 2 && "Resolving active practices, matching lead practitioners, and enriching registry data."}
+                {loadingStep === 3 && "Parsing and benchmarking local competitor transaction and market demand records."}
+                {loadingStep === 4 && "Executing Ray AI growth playbook synthesis and narrative reasoning playbooks on a rolling basis."}
               </p>
             </div>
             
-            {/* Step Checklists */}
-            <div style={{ width: "100%", maxWidth: "500px", display: "flex", flexDirection: "column", gap: "12px", marginTop: "12px" }}>
+            {/* 2x2 GLASSMORPHIC CARDS GRID */}
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+              gap: "24px",
+              width: "100%",
+              maxWidth: "800px"
+            }}>
               {LOADING_STEPS.map((step) => {
                 const isActive = loadingStep === step.id;
                 const isCompleted = loadingStep > step.id;
                 
-                // Dynamic style mapping for the diagnostic row
-                const rowStyle: React.CSSProperties = {
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  padding: "14px 20px",
+                // Get dynamic details inside each card
+                const getStepWording = (id: number) => {
+                  switch (id) {
+                    case 1:
+                      return {
+                        title: "Practo Bridge Connection",
+                        completedDesc: "Successfully connected and bridged establishment database registries.",
+                        activeDesc: "Connecting to securely bridge establishment details...",
+                        queuedDesc: "Awaiting core bridge handshake...",
+                        log: isCompleted 
+                          ? "[OK] SSL Handshake established. Mapped Practo core." 
+                          : isActive 
+                            ? "[RUNNING] Bridging Practo database registries..." 
+                            : "[QUEUED] Awaiting execution payload..."
+                      };
+                    case 2:
+                      return {
+                        title: "Doctor Registry Mapping",
+                        completedDesc: "Successfully mapped 3 active regional doctors and matched lead practitioners.",
+                        activeDesc: "Resolving active practices and mapping doctor registry data...",
+                        queuedDesc: "Awaiting registry mapping sequence...",
+                        log: isCompleted 
+                          ? "[OK] Mapped 3 active doctors and matched registry logs." 
+                          : isActive 
+                            ? "[RUNNING] Resolving 2 practices and matching lead practitioners..." 
+                            : "[QUEUED] Awaiting execution payload..."
+                      };
+                    case 3:
+                      return {
+                        title: "CSV Competitor Ingestion",
+                        completedDesc: "Successfully parsed 15,384 competitor transaction and telemetry records.",
+                        activeDesc: "Ingesting CSV competitor metrics and local transaction files...",
+                        queuedDesc: "Awaiting CSV competitor data parsing...",
+                        log: isCompleted 
+                          ? "[OK] Parsed 15,384 database metrics and computed relative ranks." 
+                          : isActive 
+                            ? "[RUNNING] Parsing 15,384 competitor transaction records..." 
+                            : "[QUEUED] Awaiting execution payload..."
+                      };
+                    case 4:
+                      return {
+                        title: "Ray AI Analysing",
+                        completedDesc: "Successfully synthesized Claude growth playbook and narrative recommendations.",
+                        activeDesc: "Executing Ray AI narrative reasoning and playbook synthesis engine...",
+                        queuedDesc: "Awaiting AI growth playbook generation...",
+                        log: isCompleted 
+                          ? "[OK] Dispatched Anthropic prompt tokens and saved growth playbook." 
+                          : isActive 
+                            ? "[RUNNING] Executing Claude AI growth playbook synthesis..." 
+                            : "[QUEUED] Awaiting execution payload..."
+                      };
+                    default:
+                      return { title: step.title, completedDesc: "", activeDesc: "", queuedDesc: "", log: "" };
+                  }
+                };
+                
+                const info = getStepWording(step.id);
+                
+                const cardStyle: React.CSSProperties = {
                   background: isCompleted 
-                    ? "rgba(16, 185, 129, 0.03)" 
+                    ? "rgba(16, 185, 129, 0.02)" 
                     : isActive 
-                      ? "rgba(245, 158, 11, 0.05)" 
-                      : "rgba(15, 23, 42, 0.4)",
+                      ? "rgba(124, 77, 255, 0.04)" 
+                      : "var(--surface-blur)",
                   border: "1px solid",
                   borderColor: isCompleted 
-                    ? "rgba(16, 185, 129, 0.3)" 
+                    ? "rgba(16, 185, 129, 0.4)" 
                     : isActive 
-                      ? "rgba(245, 158, 11, 0.4)" 
+                      ? "rgba(124, 77, 255, 0.45)" 
                       : "var(--border)",
-                  borderRadius: "14px",
-                  transition: "all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)",
-                  opacity: isCompleted || isActive ? 1 : 0.4,
-                  transform: isActive ? "scale(1)" : isCompleted ? "scale(1)" : "scale(0.98)",
-                  boxShadow: isActive ? "0 4px 16px rgba(245, 158, 11, 0.08)" : "none"
+                  borderRadius: "20px",
+                  padding: "32px",
+                  display: "flex",
+                  flexDirection: "column",
+                  position: "relative",
+                  overflow: "hidden",
+                  transition: "all 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
+                  boxShadow: isCompleted 
+                    ? "0 10px 30px rgba(16, 185, 129, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.04)" 
+                    : isActive 
+                      ? "0 15px 40px rgba(124, 77, 255, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.05)" 
+                      : "none",
+                  transform: isActive ? "translateY(-2px)" : "none"
                 };
 
-                const indicatorStyle: React.CSSProperties = {
-                  width: "24px",
-                  height: "24px",
-                  borderRadius: "50%",
-                  border: "1px solid",
-                  borderColor: isCompleted 
+                const accentBarEl: React.CSSProperties = {
+                  position: "absolute",
+                  left: 0,
+                  top: 0,
+                  bottom: 0,
+                  width: "3px",
+                  background: isCompleted 
                     ? "#10b981" 
                     : isActive 
-                      ? "#f59e0b" 
-                      : "var(--border-2)",
+                      ? "var(--purple)" 
+                      : "transparent",
+                  transition: "all 0.5s ease"
+                };
+
+                const iconWrapStyle: React.CSSProperties = {
+                  width: "36px",
+                  height: "36px",
+                  borderRadius: "50%",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontSize: "11px",
+                  fontSize: "14px",
                   fontWeight: 800,
-                  color: isCompleted 
+                  border: "1px solid",
+                  borderColor: isCompleted 
                     ? "#10b981" 
                     : isActive 
-                      ? "#f59e0b" 
+                      ? "var(--purple)" 
+                      : "rgba(255, 255, 255, 0.08)",
+                  background: isCompleted 
+                    ? "#10b981" 
+                    : isActive 
+                      ? "rgba(124, 77, 255, 0.1)" 
+                      : "#090a16",
+                  color: isCompleted 
+                    ? "#fff" 
+                    : isActive 
+                      ? "var(--purple)" 
                       : "var(--text-muted)",
+                  boxShadow: isCompleted 
+                    ? "0 0 12px rgba(16, 185, 129, 0.4)" 
+                    : isActive 
+                      ? "0 0 12px rgba(124, 77, 255, 0.2)" 
+                      : "none",
+                  transition: "all 0.5s ease"
+                };
+
+                const statusPillStyle: React.CSSProperties = {
+                  fontSize: "8.5px",
+                  fontWeight: 800,
+                  padding: "4px 12px",
+                  borderRadius: "20px",
                   background: isCompleted 
                     ? "rgba(16, 185, 129, 0.1)" 
                     : isActive 
                       ? "rgba(245, 158, 11, 0.1)" 
-                      : "var(--surface-2)",
-                  boxShadow: isCompleted 
-                    ? "0 0 8px rgba(16, 185, 129, 0.2)" 
-                    : isActive 
-                      ? "0 0 8px rgba(245, 158, 11, 0.3)" 
-                      : "none",
-                  flexShrink: 0
-                };
-
-                const statusTagStyle: React.CSSProperties = {
-                  fontSize: "9px",
-                  fontWeight: 800,
-                  padding: "4px 10px",
-                  borderRadius: "20px",
-                  letterSpacing: "0.05em",
-                  textTransform: "uppercase",
-                  color: isCompleted 
-                    ? "#10b981" 
-                    : isActive 
-                      ? "#f59e0b" 
-                      : "var(--text-muted)",
-                  background: isCompleted 
-                    ? "rgba(16, 185, 129, 0.08)" 
-                    : isActive 
-                      ? "rgba(245, 158, 11, 0.08)" 
-                      : "var(--surface-3)",
+                      : "rgba(255, 255, 255, 0.02)",
+                  color: isCompleted ? "#10b981" : isActive ? "#f59e0b" : "var(--text-muted)",
                   border: "1px solid",
                   borderColor: isCompleted 
-                    ? "rgba(16, 185, 129, 0.2)" 
+                    ? "rgba(16, 185, 129, 0.25)" 
                     : isActive 
-                      ? "rgba(245, 158, 11, 0.2)" 
-                      : "var(--border-2)",
-                  transition: "all 0.3s ease",
-                  whiteSpace: "nowrap"
+                      ? "rgba(245, 158, 11, 0.25)" 
+                      : "rgba(255, 255, 255, 0.05)",
+                  letterSpacing: "0.06em",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px"
                 };
 
                 return (
-                  <div key={step.id} style={rowStyle}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                      <div style={indicatorStyle}>
-                        {isCompleted ? "✓" : isActive ? "⚡" : "•"}
-                      </div>
-                      <div style={{ textAlign: "left" }}>
-                        <div style={{
-                          fontSize: "13px",
-                          fontWeight: 700,
-                          color: isActive || isCompleted ? "var(--text)" : "var(--text-muted)",
-                          transition: "color 0.3s ease"
-                        }}>{step.title}</div>
-                        <div style={{
-                          fontSize: "11px",
-                          color: "var(--text-muted)",
-                          marginTop: "2px",
-                          lineHeight: 1.4
-                        }}>{step.description}</div>
+                  <div key={step.id} className="card" style={cardStyle}>
+                    <div style={accentBarEl} />
+                    
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
+                      <span style={statusPillStyle}>
+                        <span style={{
+                          width: "5px",
+                          height: "5px",
+                          borderRadius: "50%",
+                          background: isCompleted ? "#10b981" : isActive ? "#f59e0b" : "rgba(255,255,255,0.25)",
+                          display: "inline-block",
+                          animation: isActive ? "pulse 2s infinite" : "none"
+                        }} />
+                        {isCompleted ? "Resolved" : isActive ? "Processing" : "Queued"}
+                      </span>
+                      
+                      <div style={iconWrapStyle}>
+                        {isCompleted ? (
+                          "✓"
+                        ) : isActive ? (
+                          <div style={{
+                            width: "16px",
+                            height: "16px",
+                            borderRadius: "50%",
+                            border: "2px solid rgba(124, 77, 255, 0.15)",
+                            borderTopColor: "var(--purple)",
+                            animation: "spin 1s linear infinite"
+                          }} />
+                        ) : (
+                          step.id
+                        )}
                       </div>
                     </div>
-                    <div style={statusTagStyle}>
-                      {isCompleted ? "RESOLVED" : isActive ? "PROCESSING" : "QUEUED"}
+                    
+                    <h4 style={{
+                      fontSize: "15px",
+                      fontWeight: 700,
+                      letterSpacing: "-0.01em",
+                      color: isCompleted || isActive ? "var(--text)" : "var(--text-muted)",
+                      marginBottom: "12px",
+                      transition: "color 0.3s ease",
+                      textAlign: "left"
+                    }}>
+                      {step.id}. {info.title}
+                    </h4>
+                    
+                    <p style={{
+                      fontSize: "12px",
+                      color: "var(--text-muted)",
+                      lineHeight: 1.6,
+                      transition: "color 0.3s ease",
+                      textAlign: "left",
+                      minHeight: "40px"
+                    }}>
+                      {isCompleted ? info.completedDesc : isActive ? info.activeDesc : info.queuedDesc}
+                    </p>
+                    
+                    <div style={{
+                      marginTop: "auto",
+                      paddingTop: "20px",
+                      borderTop: "1px solid rgba(255, 255, 255, 0.04)",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px",
+                      fontFamily: "'JetBrains Mono', monospace",
+                      fontSize: "11px",
+                      color: isCompleted ? "#10b981" : isActive ? "var(--purple-text)" : "var(--text-muted)"
+                    }}>
+                      {info.log}
                     </div>
                   </div>
                 );
               })}
             </div>
+            
           </div>
         </div>
       )}
