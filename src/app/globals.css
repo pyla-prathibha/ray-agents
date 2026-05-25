@@ -798,10 +798,173 @@ html,body{height:100%!important;background:var(--bg)!important;color:var(--text)
 }
 .content-tile:hover .play-btn-circle {
   transform: scale(1);
+}/* ── PREMIUM INTERACTIVE DIAGNOSTIC LOADER ── */
+.diagnostic-card {
+  border: 1px solid rgba(124, 77, 255, 0.15) !important;
+  box-shadow: 0 8px 32px rgba(15, 23, 42, 0.45) !important;
+  background: linear-gradient(135deg, rgba(12, 15, 23, 0.95), rgba(24, 18, 48, 0.95)) !important;
 }
 
+.diagnostic-scan-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.3) 20%, rgba(124, 77, 255, 0.6) 50%, rgba(6, 182, 212, 0.3) 80%, transparent);
+  box-shadow: 0 0 12px rgba(124, 77, 255, 0.5);
+  animation: laserScan 4s linear infinite;
+  pointer-events: none;
+  z-index: 1;
+}
 
+@keyframes laserScan {
+  0% { top: -2%; }
+  50% { top: 102%; }
+  100% { top: -2%; }
+}
 
+.loader-ring-wrapper {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, transparent 30%, var(--purple) 70%, var(--cyan) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: spinLoader 1.5s linear infinite;
+  box-shadow: 0 0 20px rgba(124, 77, 255, 0.25);
+}
 
+.loader-ring-inner {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #0f121d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+  animation: counterSpin 1.5s linear infinite;
+  box-shadow: inset 0 0 10px rgba(124, 77, 255, 0.15);
+}
 
+@keyframes spinLoader {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
 
+@keyframes counterSpin {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+.diagnostic-step-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  background: rgba(15, 23, 42, 0.4);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  opacity: 0.4;
+  transform: scale(0.98);
+}
+
+.diagnostic-step-row.active {
+  opacity: 1;
+  transform: scale(1);
+  border-color: rgba(245, 158, 11, 0.4);
+  background: rgba(245, 158, 11, 0.05);
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.08);
+}
+
+.diagnostic-step-row.completed {
+  opacity: 1;
+  transform: scale(1);
+  border-color: rgba(16, 185, 129, 0.3);
+  background: rgba(16, 185, 129, 0.03);
+}
+
+.step-status-indicator {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid var(--border-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--text-muted);
+  background: var(--surface-2);
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.diagnostic-step-row.active .step-status-indicator {
+  border-color: #f59e0b;
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.1);
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.3);
+  animation: indicatorPulse 1.5s ease-in-out infinite alternate;
+}
+
+.diagnostic-step-row.completed .step-status-indicator {
+  border-color: #10b981;
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.2);
+}
+
+@keyframes indicatorPulse {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.1); box-shadow: 0 0 12px rgba(245, 158, 11, 0.45); }
+}
+
+.step-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+  transition: color 0.3s ease;
+}
+
+.diagnostic-step-row.active .step-title,
+.diagnostic-step-row.completed .step-title {
+  color: var(--text);
+}
+
+.step-description {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+  line-height: 1.4;
+}
+
+.step-status-tag {
+  font-size: 9px;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 20px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  background: var(--surface-3);
+  border: 1px solid var(--border-2);
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.diagnostic-step-row.active .step-status-tag {
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.08);
+  border-color: rgba(245, 158, 11, 0.2);
+}
+
+.diagnostic-step-row.completed .step-status-tag {
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.08);
+  border-color: rgba(16, 185, 129, 0.2);
+}

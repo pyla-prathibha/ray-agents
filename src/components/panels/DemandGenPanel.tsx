@@ -43,6 +43,13 @@ const BADGE_CLASS: Record<string, string> = {
   carousel: "type-carousel",
 };
 
+const LOADING_STEPS = [
+  { id: 1, title: "Establishing Practo Bridge", description: "Connecting to securely bridge establishment details..." },
+  { id: 2, title: "Mapping Lead Practitioners", description: "Resolving active practices and matching lead practitioners..." },
+  { id: 3, title: "Analyzing Local Competitors", description: "Parsing and benchmarking local competitor transaction records..." },
+  { id: 4, title: "Synthesizing Growth Insights", description: "Executing Ray AI growth narrative reasoning engine..." },
+];
+
 const getChannelMetrics = (key: string, baseline: number) => {
   switch (key) {
     case "practo_listing":
@@ -109,7 +116,18 @@ export default function DemandGenPanel({ onToast }: DemandGenPanelProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showAllDoctors, setShowAllDoctors] = useState(false);
+  const [loadingStep, setLoadingStep] = useState(1);
   const abortControllerRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    if (loading) {
+      setLoadingStep(1);
+      const timer = setInterval(() => {
+        setLoadingStep(prev => (prev < 4 ? prev + 1 : 4));
+      }, 1200);
+      return () => clearInterval(timer);
+    }
+  }, [loading]);
 
   const loadClinicData = useCallback(async (id: string) => {
     if (abortControllerRef.current) {
@@ -306,14 +324,186 @@ export default function DemandGenPanel({ onToast }: DemandGenPanelProps) {
 
       {/* ── LOADING STATE ── */}
       {loading && (
-        <div className="card" style={{ textAlign: "center", padding: "60px 24px" }}>
-          <div className="ai-thinking" style={{ justifyContent: "center", marginBottom: "16px" }}>
-            <span className="ai-thinking-dot" />
-            <span className="ai-thinking-dot" />
-            <span className="ai-thinking-dot" />
-          </div>
-          <div style={{ fontSize: "14px", color: "var(--text-muted)" }}>
-            Fetching live clinic details, matching doctors, parsing competitor CSV, and running AI generation...
+        <div className="card" style={{ 
+          padding: "48px 32px", 
+          position: "relative", 
+          overflow: "hidden",
+          border: "1px solid rgba(124, 77, 255, 0.15)",
+          boxShadow: "0 8px 32px rgba(15, 23, 42, 0.45)",
+          background: "linear-gradient(135deg, rgba(12, 15, 23, 0.95), rgba(24, 18, 48, 0.95))",
+          borderRadius: "20px"
+        }}>
+          {/* Moving laser scan overlay */}
+          <div className="diagnostic-scan-overlay" style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "4px",
+            background: "linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.3) 20%, rgba(124, 77, 255, 0.6) 50%, rgba(6, 182, 212, 0.3) 80%, transparent)",
+            boxShadow: "0 0 12px rgba(124, 77, 255, 0.5)",
+            animation: "laserScan 4s linear infinite",
+            pointerEvents: "none",
+            zIndex: 1
+          }} />
+          
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "24px" }}>
+            {/* High-tech radial loader */}
+            <div className="loader-ring-wrapper" style={{
+              position: "relative",
+              width: "64px",
+              height: "64px",
+              borderRadius: "50%",
+              background: "conic-gradient(from 0deg, transparent 30%, var(--purple) 70%, var(--cyan) 100%)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              animation: "spinLoader 1.5s linear infinite",
+              boxShadow: "0 0 20px rgba(124, 77, 255, 0.25)"
+            }}>
+              <div className="loader-ring-inner" style={{
+                width: "56px",
+                height: "56px",
+                borderRadius: "50%",
+                background: "#0f121d",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "var(--text)",
+                animation: "counterSpin 1.5s linear infinite",
+                boxShadow: "inset 0 0 10px rgba(124, 77, 255, 0.15)"
+              }}>
+                <span style={{ fontSize: "24px", animation: "indicatorPulse 1.5s ease-in-out infinite alternate" }}>⚡</span>
+              </div>
+            </div>
+            
+            <div style={{ textAlign: "center", maxWidth: "480px" }}>
+              <h3 style={{ fontSize: "16px", fontWeight: 800, color: "var(--text)", marginBottom: "6px" }}>
+                Synthesizing Clinic Demand Insights
+              </h3>
+              <p style={{ fontSize: "12px", color: "var(--text-muted)", lineHeight: 1.5 }}>
+                Ray is parsing geo-intel search databases, competitor metrics, and running Claude playbooks in real time.
+              </p>
+            </div>
+            
+            {/* Step Checklists */}
+            <div style={{ width: "100%", maxWidth: "500px", display: "flex", flexDirection: "column", gap: "12px", marginTop: "12px" }}>
+              {LOADING_STEPS.map((step) => {
+                const isActive = loadingStep === step.id;
+                const isCompleted = loadingStep > step.id;
+                
+                // Dynamic style mapping for the diagnostic row
+                const rowStyle: React.CSSProperties = {
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  padding: "14px 20px",
+                  background: isCompleted 
+                    ? "rgba(16, 185, 129, 0.03)" 
+                    : isActive 
+                      ? "rgba(245, 158, 11, 0.05)" 
+                      : "rgba(15, 23, 42, 0.4)",
+                  border: "1px solid",
+                  borderColor: isCompleted 
+                    ? "rgba(16, 185, 129, 0.3)" 
+                    : isActive 
+                      ? "rgba(245, 158, 11, 0.4)" 
+                      : "var(--border)",
+                  borderRadius: "14px",
+                  transition: "all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)",
+                  opacity: isCompleted || isActive ? 1 : 0.4,
+                  transform: isActive ? "scale(1)" : isCompleted ? "scale(1)" : "scale(0.98)",
+                  boxShadow: isActive ? "0 4px 16px rgba(245, 158, 11, 0.08)" : "none"
+                };
+
+                const indicatorStyle: React.CSSProperties = {
+                  width: "24px",
+                  height: "24px",
+                  borderRadius: "50%",
+                  border: "1px solid",
+                  borderColor: isCompleted 
+                    ? "#10b981" 
+                    : isActive 
+                      ? "#f59e0b" 
+                      : "var(--border-2)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "11px",
+                  fontWeight: 800,
+                  color: isCompleted 
+                    ? "#10b981" 
+                    : isActive 
+                      ? "#f59e0b" 
+                      : "var(--text-muted)",
+                  background: isCompleted 
+                    ? "rgba(16, 185, 129, 0.1)" 
+                    : isActive 
+                      ? "rgba(245, 158, 11, 0.1)" 
+                      : "var(--surface-2)",
+                  boxShadow: isCompleted 
+                    ? "0 0 8px rgba(16, 185, 129, 0.2)" 
+                    : isActive 
+                      ? "0 0 8px rgba(245, 158, 11, 0.3)" 
+                      : "none",
+                  flexShrink: 0
+                };
+
+                const statusTagStyle: React.CSSProperties = {
+                  fontSize: "9px",
+                  fontWeight: 800,
+                  padding: "4px 10px",
+                  borderRadius: "20px",
+                  letterSpacing: "0.05em",
+                  textTransform: "uppercase",
+                  color: isCompleted 
+                    ? "#10b981" 
+                    : isActive 
+                      ? "#f59e0b" 
+                      : "var(--text-muted)",
+                  background: isCompleted 
+                    ? "rgba(16, 185, 129, 0.08)" 
+                    : isActive 
+                      ? "rgba(245, 158, 11, 0.08)" 
+                      : "var(--surface-3)",
+                  border: "1px solid",
+                  borderColor: isCompleted 
+                    ? "rgba(16, 185, 129, 0.2)" 
+                    : isActive 
+                      ? "rgba(245, 158, 11, 0.2)" 
+                      : "var(--border-2)",
+                  transition: "all 0.3s ease",
+                  whiteSpace: "nowrap"
+                };
+
+                return (
+                  <div key={step.id} style={rowStyle}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                      <div style={indicatorStyle}>
+                        {isCompleted ? "✓" : isActive ? "⚡" : "•"}
+                      </div>
+                      <div style={{ textAlign: "left" }}>
+                        <div style={{
+                          fontSize: "13px",
+                          fontWeight: 700,
+                          color: isActive || isCompleted ? "var(--text)" : "var(--text-muted)",
+                          transition: "color 0.3s ease"
+                        }}>{step.title}</div>
+                        <div style={{
+                          fontSize: "11px",
+                          color: "var(--text-muted)",
+                          marginTop: "2px",
+                          lineHeight: 1.4
+                        }}>{step.description}</div>
+                      </div>
+                    </div>
+                    <div style={statusTagStyle}>
+                      {isCompleted ? "RESOLVED" : isActive ? "PROCESSING" : "QUEUED"}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
       )}
