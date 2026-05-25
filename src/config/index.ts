@@ -1,7 +1,7 @@
 export const config = {
   anthropic: {
     oauthToken: process.env.CLAUDE_CODE_OAUTH_TOKEN || process.env.CLAUDE_OAUTH_TOKEN || process.env.ANTHROPIC_API_KEY || "",
-    model: "claude-sonnet-4-6" as const,
+    model: "claude-haiku-4-5" as const,
   },
   ringai: {
     apiKey: process.env.RINGG_API_KEY || "",

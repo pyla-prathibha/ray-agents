@@ -442,13 +442,13 @@ export default function DemandGenPanel({ onToast }: DemandGenPanelProps) {
                     case 4:
                       return {
                         title: "Ray AI Analysing",
-                        completedDesc: "Successfully synthesized Claude growth playbook and narrative recommendations.",
+                        completedDesc: "Successfully synthesized Ray AI growth playbook and narrative recommendations.",
                         activeDesc: "Executing Ray AI narrative reasoning and playbook synthesis engine...",
                         queuedDesc: "Awaiting AI growth playbook generation...",
                         log: isCompleted 
                           ? "[OK] Dispatched Anthropic prompt tokens and saved growth playbook." 
                           : isActive 
-                            ? "[RUNNING] Executing Claude AI growth playbook synthesis..." 
+                            ? "[RUNNING] Executing Ray AI growth playbook synthesis..." 
                             : "[QUEUED] Awaiting execution payload..."
                       };
                     default:
@@ -673,6 +673,18 @@ export default function DemandGenPanel({ onToast }: DemandGenPanelProps) {
               Connected to Practo Bridge
             </div>
           </div>
+
+          {/* RAY AI SUMMARY */}
+          {report?.growth_report_narrative && (
+            <div className="glow-card narrative-box" style={{ marginTop: "24px" }}>
+              <div className="glow-card-inner">
+                <div className="narrative-header">✨ Ray AI Summary</div>
+                <p className="narrative-text" style={{ fontSize: "13.5px", lineHeight: "1.7", color: "rgba(255, 255, 255, 0.85)" }}>
+                  {report.growth_report_narrative}
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* 5 CHANNELS */}
           <div style={{ marginTop: "24px" }}>
@@ -1235,16 +1247,6 @@ export default function DemandGenPanel({ onToast }: DemandGenPanelProps) {
               })}
             </div>
           </div>
-
-          {/* CLAUDE NARRATIVE */}
-          {report?.growth_report_narrative && (
-            <div className="glow-card narrative-box">
-              <div className="glow-card-inner">
-                <div className="narrative-header">✨ Ray AI Analysis Playbook</div>
-                <p className="narrative-text">{report.growth_report_narrative}</p>
-              </div>
-            </div>
-          )}
         </>
       )}
     </div>

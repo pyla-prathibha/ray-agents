@@ -147,12 +147,19 @@ You must return ONLY valid JSON (no markdown, no code fences) matching this exac
   "growth_report_narrative": string
 }
 
-Base your analysis on real data provided. Generate realistic bookings and channel attribution numbers derived from the doctor's monthly case volume and local search demand. The narrative must be 2-3 high-value analytical sentences. You MUST always generate exactly 5 auto-published content pieces under "content_published".
+Base your analysis on real data provided. Generate realistic bookings and channel attribution numbers derived from the doctor's monthly case volume and local search demand.
 
-STRICT CONTENT RULES (apply to every string field — narrative, platforms.*, content_published.*):
+For "growth_report_narrative", synthesize an extremely brief, high-impact executive summary of exactly 3 sentences maximum (do NOT generate long paragraphs). It must cover:
+1. Overall monthly keyword search volume trends across the metropolitan area (e.g., 32,000 dental searches in Bangalore).
+2. The clinic's relative ranking against top competitors (e.g., ranked 1st or positioned 4th).
+3. High-growth transactional intent clusters (Invisalign +28% MoM, implants +22% MoM, root canal +15% MoM) and core platform tactics.
+4. Clinic strengths (NPS, rating) and projected booking target lifts (e.g., target 350+ bookings, a 29% growth lift) and channel attribution.
+
+STRICT CONTENT & SECURITY RULES (apply to every string field — narrative, platforms.*, content_published.*):
 1. NEVER name any competing clinic, practice, hospital, or competitor doctor — even if their name appears in <competitor_density>. Refer to them only by generic descriptors ("the market leader", "top-3 competitors", "rank-1 clinic", "nearby competitors").
-2. NEVER include specific dates, day names, months, years, ISO timestamps, or fixed timeframes ("within 60 days", "by Q3", "in March", "next Thursday", "60-day", "90 days"). Speak only in continuous tense and relative cadence words ("near-term", "on a rolling basis", "ongoing", "monthly"). Month-over-month percentage metrics ("MoM", "+28% MoM") are allowed because they are units, not dates.
-3. Names of the clinic being analyzed, its own doctors, localities, specialties, and keyword clusters ARE allowed.`;
+2. SECURITY RULE: NEVER include any other PII (personally identifiable information) or private contact data in any of the output strings. This includes patient full names, patient email addresses, patient phone numbers, patient home addresses, or confidential private diagnostic cases. Only refer to the analyzed clinic's own doctor names and public metrics.
+3. NEVER include specific dates, day names, months, years, ISO timestamps, or fixed timeframes ("within 60 days", "by Q3", "in March", "next Thursday", "60-day", "90 days"). Speak only in continuous tense and relative cadence words ("near-term", "on a rolling basis", "ongoing", "monthly"). Month-over-month percentage metrics ("MoM", "+28% MoM") are allowed because they are units, not dates.
+4. Names of the clinic being analyzed, its own doctors, localities, specialties, and keyword clusters ARE allowed.`;
 
 export interface ClinicDashboardData {
   clinic: PractoEstablishment;
@@ -212,7 +219,7 @@ function getFallbackReport(): DemandGenReport {
       doctor_video_shorts: ["The truth about dental implant pain — what patients actually feel", "How CAD/CAM lets us make crowns in a single visit", "Why Invisalign is perfect for Bangalore IT professionals"],
       whatsapp_broadcast: "Segment past patients into: (1) routine cleaning due cohort, (2) Invisalign progress check cohort, (3) Crown/implant follow-up cohort. Send personalized reminders with booking links.",
     },
-    growth_report_narrative: "Teeth alignment and implant search volume grew 28% MoM in Koramangala, while 50% of nearby competitors lack cashless billing. By geo-fencing Meta ads around HSR Layout tech hubs focusing on weekend slots and cashless insurance, you can capture high-intent corporate patients. Shifting 15% of budget to auto-clipped video shorts on Invisalign and laser dentistry will lower average lead costs by an estimated 15%.",
+    growth_report_narrative: "With 32,000 monthly dental searches in Bangalore and the clinic positioned 4th locally, near-term leverage lies in capturing Invisalign (+28% MoM), implants (+22% MoM), and root canal (+15% MoM) query spikes via synchronized Practo bids and geo-fenced search ads. Your perfect NPS of 100 is a premium trust asset that, when amplified through keyword-embedded replies and weekly posts, will neutralize competitor moats on a rolling basis. Coordinated execution of this five-channel playbook is projected to grow monthly booked cases from 4 to 20—a 5x target growth lift carrying 35% Practo channel attribution.",
   };
 }
 
