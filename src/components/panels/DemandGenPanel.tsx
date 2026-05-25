@@ -348,7 +348,7 @@ export default function DemandGenPanel({ onToast }: DemandGenPanelProps) {
                 📊 <span style={{ color: "var(--purple-text)", fontWeight: 800 }}>Clinic Demand Generation Profile</span> &middot; {data.clinic.name}
               </div>
               <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "4px" }}>
-                Locality: <strong style={{ color: "var(--text-2)" }}>{data.clinic.locality || "Koramangala"}</strong> &middot; {data.clinic.address}, {data.clinic.city}
+                Locality: <strong style={{ color: "var(--text-2)" }}>{data.clinic.locality || "Local Area"}</strong> &middot; {data.clinic.address}, {data.clinic.city}
               </div>
             </div>
             <div className="status-live" style={{ fontSize: "11px" }}>
@@ -443,7 +443,7 @@ export default function DemandGenPanel({ onToast }: DemandGenPanelProps) {
                 <div className="metric-card cyan">
                   <div className="metric-label">Local Competitors</div>
                   <div className="metric-val cyan">{Math.max(0, competitorCount - 1)}</div>
-                  <div className="metric-delta delta-dn">↓ In {data.clinic.locality || "Koramangala"}</div>
+                  <div className="metric-delta delta-dn">↓ In {data.clinic.locality || "the locality"}</div>
                 </div>
               </div>
 
@@ -601,7 +601,7 @@ export default function DemandGenPanel({ onToast }: DemandGenPanelProps) {
                   <div>
                     <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>Target Locality</div>
                     <div style={{ fontSize: "15px", fontWeight: 700, color: "var(--text)", textTransform: "capitalize" }}>
-                      {data.competitors.top_competitors[0]?.locality || data.clinic.locality || "Koramangala"}
+                      {data.competitors.top_competitors[0]?.locality || data.clinic.locality || "Local Area"}
                     </div>
                   </div>
                   <div style={{ textAlign: "right" }}>
@@ -847,7 +847,7 @@ export default function DemandGenPanel({ onToast }: DemandGenPanelProps) {
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: "8px", height: "220px", overflowY: "auto", paddingRight: "4px" }}>
                   {data.geoIntent.localities.map((loc, i) => {
-                    const isCurrentLocality = loc.name.toLowerCase() === (data.clinic.locality || "koramangala").toLowerCase();
+                    const isCurrentLocality = loc.name.toLowerCase() === (data.clinic.locality || "local area").toLowerCase();
                     return (
                       <div key={i} className={`locality-item ${isCurrentLocality ? "current-locality" : ""}`} style={{ flexShrink: 0 }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>

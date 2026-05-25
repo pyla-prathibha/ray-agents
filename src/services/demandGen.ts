@@ -147,7 +147,12 @@ You must return ONLY valid JSON (no markdown, no code fences) matching this exac
   "growth_report_narrative": string
 }
 
-Base your analysis on real data provided. Generate realistic bookings and channel attribution numbers derived from the doctor's monthly case volume and local search demand. The narrative must be 2-3 high-value analytical sentences. You MUST always generate exactly 5 auto-published content pieces under "content_published".`;
+Base your analysis on real data provided. Generate realistic bookings and channel attribution numbers derived from the doctor's monthly case volume and local search demand. The narrative must be 2-3 high-value analytical sentences. You MUST always generate exactly 5 auto-published content pieces under "content_published".
+
+STRICT CONTENT RULES (apply to every string field — narrative, platforms.*, content_published.*):
+1. NEVER name any competing clinic, practice, hospital, or competitor doctor — even if their name appears in <competitor_density>. Refer to them only by generic descriptors ("the market leader", "top-3 competitors", "rank-1 clinic", "nearby competitors").
+2. NEVER include specific dates, day names, months, years, ISO timestamps, or fixed timeframes ("within 60 days", "by Q3", "in March", "next Thursday", "60-day", "90 days"). Speak only in continuous tense and relative cadence words ("near-term", "on a rolling basis", "ongoing", "monthly"). Month-over-month percentage metrics ("MoM", "+28% MoM") are allowed because they are units, not dates.
+3. Names of the clinic being analyzed, its own doctors, localities, specialties, and keyword clusters ARE allowed.`;
 
 export interface ClinicDashboardData {
   clinic: PractoEstablishment;
@@ -194,20 +199,20 @@ function getFallbackReport(): DemandGenReport {
       whatsapp_broadcasts: { bookings: 1, pct: 2 },
     },
     content_published: [
-      { type: "Video Short · 32 Sec", title: "\"How CAD/CAM dental crowns are made in 1 day\"", metric: "Auto-clipped · 4.2K views", badge: "video" },
+      { type: "Video Short · 32 Sec", title: "\"How CAD/CAM dental crowns are made in a single visit\"", metric: "Auto-clipped · 4.2K views", badge: "video" },
       { type: "Google Post", title: "\"Why laser root canals are virtually pain-free\"", metric: "Auto-written · 78 saves", badge: "post" },
       { type: "Meta Carousel", title: "\"Rahul's Invisalign smile journey at Koramangala\"", metric: "Attributed · CTR +34%", badge: "carousel" },
       { type: "Video Short · 45 Sec", title: "\"The truth about dental implant pain — patient review\"", metric: "Auto-clipped · 8.9K views", badge: "video" },
       { type: "Google Post", title: "\"Understanding Invisalign vs traditional metal braces\"", metric: "Auto-written · 142 saves", badge: "post" },
     ],
     platforms: {
-      practo_optimization: "Optimize auto-bids for 'root canal treatment Koramangala' (1,400 monthly searches). Highlight CAD/CAM digital crowns and laser dentistry in listing photos. Add FAQ entries for 'dental implant cost' and 'invisalign duration'. Set consultation fee at ₹100 to undercut competitors averaging ₹70.",
+      practo_optimization: "Optimize auto-bids for 'root canal treatment Koramangala' (1,400 monthly searches). Highlight CAD/CAM digital crowns and laser dentistry in listing photos. Add FAQ entries for 'dental implant cost' and 'invisalign duration'. Set consultation fee at ₹100 to undercut nearby competitors averaging ₹70.",
       google_business_profile: "Publish weekly auto-posts highlighting 94 NPS rating and painless laser root canal testimonials. Set up auto-reply templates for review responses mentioning 'Dr. Victor Mag' and 'same-day crown' capabilities.",
       meta_google_ads: "Geo-fence campaigns within 5km of Koramangala 3rd/5th/7th Blocks and HSR Layout Sector 4. Target tech professionals aged 22–45 with creatives focusing on 'Weekend Appointments', 'Cashless Corporate Insurance', and 'Same-Day Crowns'. A/B test video vs. carousel formats.",
-      doctor_video_shorts: ["The truth about dental implant pain — what patients actually feel", "How CAD/CAM lets us make crowns in one single day", "Why Invisalign is perfect for Bangalore IT professionals"],
-      whatsapp_broadcast: "Segment past patients into: (1) 6-month cleaning due cohort, (2) Invisalign progress check cohort, (3) Crown/implant follow-up cohort. Send personalized reminders with booking links.",
+      doctor_video_shorts: ["The truth about dental implant pain — what patients actually feel", "How CAD/CAM lets us make crowns in a single visit", "Why Invisalign is perfect for Bangalore IT professionals"],
+      whatsapp_broadcast: "Segment past patients into: (1) routine cleaning due cohort, (2) Invisalign progress check cohort, (3) Crown/implant follow-up cohort. Send personalized reminders with booking links.",
     },
-    growth_report_narrative: "Teeth alignment and implant search volume grew 28% MoM in Koramangala, while 50% of competitors lack cashless billing. By geo-fencing Meta ads around HSR Layout tech hubs focusing on weekend slots and cashless insurance, you can capture high-intent corporate patients. Shifting 15% of budget to auto-clipped video shorts on Invisalign and laser dentistry will lower average lead costs by an estimated 15%.",
+    growth_report_narrative: "Teeth alignment and implant search volume grew 28% MoM in Koramangala, while 50% of nearby competitors lack cashless billing. By geo-fencing Meta ads around HSR Layout tech hubs focusing on weekend slots and cashless insurance, you can capture high-intent corporate patients. Shifting 15% of budget to auto-clipped video shorts on Invisalign and laser dentistry will lower average lead costs by an estimated 15%.",
   };
 }
 
@@ -283,6 +288,9 @@ export async function fetchClinicData(clinicId: string): Promise<ClinicDashboard
         const matched = findClinic(clinicId, clinic.name, clinic.locality || "hsr layout", csvRows);
         
         if (matched) {
+          if (matched.zone) {
+            clinic.locality = matched.zone.trim().charAt(0).toUpperCase() + matched.zone.trim().slice(1).toLowerCase();
+          }
           const targetZone = (matched.zone || clinic.locality || "hsr layout").trim().toLowerCase();
           const targetSpec = "General Dentistry";
 
