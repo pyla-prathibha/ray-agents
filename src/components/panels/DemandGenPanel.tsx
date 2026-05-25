@@ -146,7 +146,7 @@ export default function DemandGenPanel({ onToast }: DemandGenPanelProps) {
         throw new Error(json.error || "Failed to fetch clinic data");
       }
     } catch (err) {
-      if (err instanceof Error && err.name === "AbortError") {
+      if (controller.signal.aborted || (err instanceof Error && err.name === "AbortError")) {
         console.log("Fetch request aborted.");
         return;
       }
