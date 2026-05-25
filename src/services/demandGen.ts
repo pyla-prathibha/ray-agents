@@ -494,10 +494,12 @@ export async function fetchClinicData(clinicId: string): Promise<ClinicDashboard
   }
 
   // Try running Claude analysis
+  console.log(`[DemandGen] Starting Claude analysis for clinicId=${clinicId} elapsed=${Date.now() - overallStart}ms`);
   let report: DemandGenReport | null = null;
   const token = config.anthropic.oauthToken;
   if (token) {
     try {
+      const claudeStart = Date.now();
       const doctorSignal = doctors.length > 0 ? {
         lead_doctor_name: doctors[0].name,
         doctor_specialty: doctors[0].speciality,
@@ -512,11 +514,13 @@ export async function fetchClinicData(clinicId: string): Promise<ClinicDashboard
 <competitor_density>${JSON.stringify(competitors)}</competitor_density>
 <doctor_signal>${JSON.stringify(doctorSignal)}</doctor_signal>`;
 
+      console.log(`[DemandGen] Calling Claude SDK for clinicId=${clinicId}...`);
       const rawResponse = await callClaude(SYSTEM_PROMPT, userMessage);
+      console.log(`[DemandGen] Claude SDK responded in ${Date.now() - claudeStart}ms for clinicId=${clinicId}`);
       const cleaned = rawResponse.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
       report = JSON.parse(cleaned) as DemandGenReport;
     } catch (error) {
-      console.warn("[DemandGen] Claude API call failed, using fallback:", (error as Error).message);
+      console.warn(`[DemandGen] Claude API call failed after ${Date.now() - claudeStart}ms:`, (error as Error).message);
       report = getFallbackReport();
     }
   } else {
