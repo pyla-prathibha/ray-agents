@@ -11,6 +11,7 @@ export async function POST(request: NextRequest) {
       doctor_name,
       doctor_specialty,
       agent_type = "post-opd",
+      call_scenario,
     } = body;
 
     if (!mobile_number) {
@@ -32,6 +33,7 @@ export async function POST(request: NextRequest) {
         patient_name: patient_name || "Patient",
         doctor_name: doctor_name || "Dr. Victor Mag",
         doctor_specialty: doctor_specialty || "Dentist",
+        ...(call_scenario ? { call_scenario } : {}),
       },
     });
 

@@ -9,7 +9,7 @@ function headers() {
   };
 }
 
-export type OutboundAgentType = "post-opd" | "reactivation";
+export type OutboundAgentType = "post-opd" | "reactivation" | "inbound";
 
 export interface InitiateCallParams {
   patientName: string;
@@ -33,6 +33,10 @@ const AGENT_CONFIG: Record<OutboundAgentType, { agentId: string; fromNumberId: s
     agentId: config.ringai.reactivationAgentId,
     fromNumberId: config.ringai.reactivationFromNumberId,
   },
+  inbound: {
+    agentId: config.ringai.inboundAgentId,
+    fromNumberId: config.ringai.postOpdFromNumberId,
+  },
 };
 
 function buildCustomArgs(params: InitiateCallParams): Record<string, string> {
@@ -40,6 +44,19 @@ function buildCustomArgs(params: InitiateCallParams): Record<string, string> {
     callee_name: params.patientName,
     mobile_number: params.mobileNumber,
   };
+
+  if (params.agentType === "inbound") {
+    return {
+      ...common,
+      practice_name: params.customArgs?.practice_name || "MR City Clinic",
+      doctor_name: params.customArgs?.doctor_name || "Victor Mag",
+      doctor_id: params.customArgs?.doctor_id || "666305",
+      practice_id: params.customArgs?.practice_id || "1193594",
+      practice_reference_id: params.customArgs?.practice_reference_id || "cb44e142-8fa1-4559-ae12-d595833ee5c3",
+      doctor_reference_id: params.customArgs?.doctor_reference_id || "85fc1e48-602a-41fb-af83-ec65a9ef7660",
+      ...params.customArgs,
+    };
+  }
 
   if (params.agentType === "post-opd") {
     // Post Booking Call agent
@@ -103,6 +120,7 @@ export async function initiateOutboundCall(
   };
 
   console.log(`[RingAI] Initiating ${params.agentType} call to ${params.mobileNumber} via agent ${agentCfg.agentId}`);
+  console.log(`[RingAI] Request Payload:`, JSON.stringify(body, null, 2));
 
   const res = await fetch(`${BASE_URL}/calling/outbound/individual`, {
     method: "POST",

@@ -17,7 +17,7 @@ export const INBOUND_DIALOGUE = [
   },
   {
     sender: "ai" as const,
-    text: "Perfect! I've reserved that slot for you. Calling our Dhanvantri booking engine now... Confirmed! Saturday, May 23rd at 10:30 AM with Dr. Victor Mag. A confirmation WhatsApp is on its way.",
+    text: "Perfect! I've reserved that slot for you. Calling our Ray booking engine now... Confirmed! Saturday, May 23rd at 10:30 AM with Dr. Victor Mag. A confirmation WhatsApp is on its way.",
   },
   {
     sender: "patient" as const,

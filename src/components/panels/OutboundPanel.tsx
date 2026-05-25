@@ -41,6 +41,7 @@ export default function OutboundPanel({ onToast }: OutboundPanelProps) {
   const [patientName, setPatientName] = useState("Sharath");
   const [doctorName, setDoctorName] = useState("Victor Mag");
   const [specialty, setSpecialty] = useState("Dentist");
+  const [callScenario, setCallScenario] = useState("CONFIRMATION");
 
   const [callStatus, setCallStatus] = useState("Idle");
   const [callActive, setCallActive] = useState(false);
@@ -158,6 +159,7 @@ export default function OutboundPanel({ onToast }: OutboundPanelProps) {
           doctor_name: doctor,
           doctor_specialty: spec,
           agent_type: "post-opd",
+          call_scenario: callScenario,
         }),
       });
 
@@ -208,7 +210,6 @@ export default function OutboundPanel({ onToast }: OutboundPanelProps) {
           <p className="page-sub">
             Automated follow-up calls for post-OPD patients — schedule reviews, collect feedback, and drive rebookings.
           </p>
-          <div className="agent-id-chip">009fb2be-37bd-441b-aaa5-94c2a1946cad</div>
         </div>
         <div className="call-status-card">
           <span className="eyebrow-dot" style={{
@@ -269,6 +270,16 @@ export default function OutboundPanel({ onToast }: OutboundPanelProps) {
                 className="text-input"
                 style={{ marginBottom: 0 }}
               />
+              <select
+                value={callScenario}
+                onChange={(e) => setCallScenario(e.target.value)}
+                className="text-input"
+                style={{ marginBottom: 0, gridColumn: "span 2" }}
+              >
+                <option value="CONFIRMATION" style={{ background: "var(--surface-3)", color: "var(--text)" }}>Scenario: Appointment Confirmation</option>
+                <option value="NO_SHOW_FOLLOWUP" style={{ background: "var(--surface-3)", color: "var(--text)" }}>Scenario: No Show Follow-up</option>
+                <option value="POST_VISIT_FOLLOWUP" style={{ background: "var(--surface-3)", color: "var(--text)" }}>Scenario: Post Visit Follow-up</option>
+              </select>
             </div>
 
             <button
@@ -325,11 +336,7 @@ export default function OutboundPanel({ onToast }: OutboundPanelProps) {
             <div className="from-label">Calling From</div>
             <div className="from-number-text">+91 22 6809 5634</div>
             <div className="from-sub">Verified outbound number</div>
-            <div className="from-id-row">
-              <div className="from-id-chip">
-                DID: <span>outbound-ray-prod-01</span>
-              </div>
-            </div>
+
           </div>
         </div>
 

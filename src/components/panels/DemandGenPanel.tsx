@@ -198,7 +198,7 @@ export default function DemandGenPanel({ onToast }: DemandGenPanelProps) {
         <div>
           <div className="page-eyebrow" style={{ color: "var(--purple-text)" }}>
             <span className="eyebrow-dot" style={{ background: "var(--purple)", color: "var(--purple)" }} />
-            Agent 3 &middot; Demand Generation
+            Agent 4 &middot; Demand Generation
           </div>
           <div className="page-title">Clinic Demand Dashboard</div>
           <div className="page-sub">
@@ -357,7 +357,70 @@ export default function DemandGenPanel({ onToast }: DemandGenPanelProps) {
             </div>
           </div>
 
-          <div className="demand-layout">
+          {/* 5 CHANNELS */}
+          <div style={{ marginTop: "24px" }}>
+            <div className="section-label">5 Channels Managed For You</div>
+            <div className="grid-5">
+              {ch &&
+                Object.entries(ch).map(([key, val]) => {
+                  const meta = CHANNEL_META[key];
+                  if (!meta) return null;
+                  const baseline = (data?.our_monetisable_txns && data.our_monetisable_txns > 0) ? data.our_monetisable_txns : 271;
+                  const metrics = getChannelMetrics(key, baseline);
+                  const isNew = metrics.lift === "NEW";
+                  const ratio = isNew ? 0 : (metrics.projected > 0 ? (metrics.current / metrics.projected) * 100 : 100);
+                  const liftColor = CHANNEL_COLORS[key] || "var(--purple)";
+                  return (
+                    <div key={key} className="channel-card" style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                      <div>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                          <div className="channel-card-icon">{meta.icon}</div>
+                          <span className="pill badge-ai-boost" style={{
+                            background: metrics.lift === "NEW" ? "var(--purple-light)" : "var(--green-light)",
+                            color: metrics.lift === "NEW" ? "var(--purple-text)" : "var(--green-text)",
+                            border: `1px solid ${metrics.lift === "NEW" ? "var(--purple-mid)" : "var(--green-mid)"}`,
+                          }}>
+                            <span className="badge-pulse-dot" style={{ color: metrics.lift === "NEW" ? "var(--purple)" : "var(--green)" }} />
+                            {metrics.lift}
+                          </span>
+                        </div>
+                        <div className="channel-card-name">{meta.name}</div>
+                        <div className="channel-card-desc" style={{ marginBottom: "8px", minHeight: "26px" }}>{meta.desc}</div>
+                      </div>
+
+                      {/* Dynamic Visual Lift Tracker */}
+                      <div className="lift-tracker-wrap">
+                        <div className="lift-tracker-base" style={{ width: `${ratio}%` }} />
+                        <div 
+                          className="lift-tracker-lift" 
+                          style={{ 
+                            left: `${ratio}%`, 
+                            width: `${100 - ratio}%`,
+                            background: `linear-gradient(90deg, ${liftColor} 0%, var(--purple-light) 120%)`,
+                            boxShadow: `0 0 6px ${liftColor}`
+                          }} 
+                        />
+                      </div>
+
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px", borderTop: "1px solid var(--border)", paddingTop: "10px", marginTop: "auto" }}>
+                        <div style={{ background: "var(--surface-2)", padding: "6px 8px", borderRadius: "10px", border: "1px solid var(--border)", display: "flex", flexDirection: "column", gap: "2px" }}>
+                          <span style={{ fontSize: "8px", color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.02em" }}>{metrics.currentLabel}</span>
+                          <span style={{ fontSize: "13px", fontWeight: 800, color: "var(--text-muted)", fontFamily: "var(--font-mono)" }}>{metrics.current}</span>
+                          <span style={{ fontSize: "8px", color: "var(--text-muted)", opacity: 0.8 }}>{metrics.unit}</span>
+                        </div>
+                        <div style={{ background: "var(--green-light)", padding: "6px 8px", borderRadius: "10px", border: "1px solid var(--green-mid)", display: "flex", flexDirection: "column", gap: "2px" }}>
+                          <span style={{ fontSize: "8px", color: "var(--green-text)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.02em" }}>{metrics.projectedLabel}</span>
+                          <span style={{ fontSize: "13px", fontWeight: 800, color: CHANNEL_COLORS[key], fontFamily: "var(--font-mono)" }}>{metrics.projected}</span>
+                          <span style={{ fontSize: "8px", color: "var(--text-muted)", opacity: 0.8 }}>{metrics.unit}</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>
+          </div>
+
+          <div className="demand-layout" style={{ marginTop: "24px" }}>
             {/* LEFT COLUMN */}
             <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
               {/* SIGNAL CARDS */}
@@ -814,71 +877,8 @@ export default function DemandGenPanel({ onToast }: DemandGenPanelProps) {
             </div>
           </div>
 
-          {/* 5 CHANNELS */}
-          <div>
-            <div className="section-label">5 Channels Managed For You</div>
-            <div className="grid-5">
-              {ch &&
-                Object.entries(ch).map(([key, val]) => {
-                  const meta = CHANNEL_META[key];
-                  if (!meta) return null;
-                  const baseline = (data?.our_monetisable_txns && data.our_monetisable_txns > 0) ? data.our_monetisable_txns : 271;
-                  const metrics = getChannelMetrics(key, baseline);
-                  const isNew = metrics.lift === "NEW";
-                  const ratio = isNew ? 0 : (metrics.projected > 0 ? (metrics.current / metrics.projected) * 100 : 100);
-                  const liftColor = CHANNEL_COLORS[key] || "var(--purple)";
-                  return (
-                    <div key={key} className="channel-card" style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-                      <div>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                          <div className="channel-card-icon">{meta.icon}</div>
-                          <span className="pill badge-ai-boost" style={{
-                            background: metrics.lift === "NEW" ? "var(--purple-light)" : "var(--green-light)",
-                            color: metrics.lift === "NEW" ? "var(--purple-text)" : "var(--green-text)",
-                            border: `1px solid ${metrics.lift === "NEW" ? "var(--purple-mid)" : "var(--green-mid)"}`,
-                          }}>
-                            <span className="badge-pulse-dot" style={{ color: metrics.lift === "NEW" ? "var(--purple)" : "var(--green)" }} />
-                            {metrics.lift}
-                          </span>
-                        </div>
-                        <div className="channel-card-name">{meta.name}</div>
-                        <div className="channel-card-desc" style={{ marginBottom: "8px", minHeight: "26px" }}>{meta.desc}</div>
-                      </div>
-
-                      {/* Dynamic Visual Lift Tracker */}
-                      <div className="lift-tracker-wrap">
-                        <div className="lift-tracker-base" style={{ width: `${ratio}%` }} />
-                        <div 
-                          className="lift-tracker-lift" 
-                          style={{ 
-                            left: `${ratio}%`, 
-                            width: `${100 - ratio}%`,
-                            background: `linear-gradient(90deg, ${liftColor} 0%, var(--purple-light) 120%)`,
-                            boxShadow: `0 0 6px ${liftColor}`
-                          }} 
-                        />
-                      </div>
-
-                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px", borderTop: "1px solid var(--border)", paddingTop: "10px", marginTop: "auto" }}>
-                        <div style={{ background: "var(--surface-2)", padding: "6px 8px", borderRadius: "10px", border: "1px solid var(--border)", display: "flex", flexDirection: "column", gap: "2px" }}>
-                          <span style={{ fontSize: "8px", color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.02em" }}>{metrics.currentLabel}</span>
-                          <span style={{ fontSize: "13px", fontWeight: 800, color: "var(--text-muted)", fontFamily: "var(--font-mono)" }}>{metrics.current}</span>
-                          <span style={{ fontSize: "8px", color: "var(--text-muted)", opacity: 0.8 }}>{metrics.unit}</span>
-                        </div>
-                        <div style={{ background: "var(--green-light)", padding: "6px 8px", borderRadius: "10px", border: "1px solid var(--green-mid)", display: "flex", flexDirection: "column", gap: "2px" }}>
-                          <span style={{ fontSize: "8px", color: "var(--green-text)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.02em" }}>{metrics.projectedLabel}</span>
-                          <span style={{ fontSize: "13px", fontWeight: 800, color: CHANNEL_COLORS[key], fontFamily: "var(--font-mono)" }}>{metrics.projected}</span>
-                          <span style={{ fontSize: "8px", color: "var(--text-muted)", opacity: 0.8 }}>{metrics.unit}</span>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-            </div>
-          </div>
-
           {/* CONTENT AUTO-PUBLISHED */}
-          <div>
+          <div style={{ marginTop: "24px" }}>
             <div className="section-label">Content Auto-Published This Month</div>
             <div className="grid-5">
               {report?.content_published.map((item, idx) => {

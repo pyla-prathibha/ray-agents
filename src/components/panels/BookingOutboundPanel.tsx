@@ -2,14 +2,8 @@
 
 import { useState, useCallback, useRef } from "react";
 import type { TimelineEvent } from "@/components/shared/EventTimeline";
-import {
-  buildOutboundDialogue,
-  QUEUE_PATIENTS,
-  SYSTEM_PARAMS,
-  CUSTOM_PARAMS,
-} from "@/agents/outbound/data";
 
-interface ReactivationPanelProps {
+interface BookingOutboundPanelProps {
   onToast: (msg: string) => void;
 }
 
@@ -34,13 +28,18 @@ const COHORT_STYLE: Record<string, React.CSSProperties> = {
   green: { background: "var(--green-light)", color: "var(--green-text)", border: "1px solid var(--green-mid)" },
 };
 
-const STAT_LABELS = ["OPD Consults", "Followed Up", "Booked", "Consent"];
+const STAT_LABELS = ["Booking Calls", "Answered", "Confirmed", "Conversion Rate"];
 
-export default function ReactivationPanel({ onToast }: ReactivationPanelProps) {
+const QUEUE_PATIENTS = [
+  { id: "Aarav-Mehta", name: "Aarav Mehta", meta: "Inquiry: Root Canal", visit: "Today", cohort: "New Inquiry", cohortStyle: "purple", status: "Booked" },
+  { id: "Meera-Nair", name: "Meera Nair", meta: "Inquiry: Dental Crown", visit: "Yesterday", cohort: "Lead Follow-up", cohortStyle: "blue", status: "Called" },
+  { id: "Aditya-Reddy", name: "Aditya Reddy", meta: "Inquiry: Invisalign", visit: "Yesterday", cohort: "High Intent", cohortStyle: "orange", status: "Queued" },
+  { id: "Zara-Khan", name: "Zara Khan", meta: "Inquiry: Teeth Cleaning", visit: "2 days ago", cohort: "General Inquiry", cohortStyle: "green", status: "Booked" },
+];
+
+export default function BookingOutboundPanel({ onToast }: BookingOutboundPanelProps) {
   const [phone, setPhone] = useState("");
-  const [patientName, setPatientName] = useState("Anjali Sharma");
-  const [doctorName, setDoctorName] = useState("Dr. Victor Mag");
-  const [specialty, setSpecialty] = useState("Dentist");
+  const [patientName, setPatientName] = useState("");
 
   const [callStatus, setCallStatus] = useState("Idle");
   const [callActive, setCallActive] = useState(false);
@@ -48,10 +47,6 @@ export default function ReactivationPanel({ onToast }: ReactivationPanelProps) {
   const [showTimer, setShowTimer] = useState(false);
 
   const [events, setEvents] = useState<TimelineEvent[]>(INITIAL_EVENTS);
-
-  const [queuePatients, setQueuePatients] = useState([...QUEUE_PATIENTS]);
-  const [stats, setStats] = useState({ opdConsults: 1240, followedUp: 142, booked: 68 });
-
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const ts = () => new Date().toLocaleTimeString("en-IN", { hour12: false });
@@ -102,7 +97,6 @@ export default function ReactivationPanel({ onToast }: ReactivationPanelProps) {
 
           // Stop polling when call is done
           if (call.status === "completed" || call.status === "failed" || call.status === "voicemail") {
-            // Wait a bit more for Claude analysis
             setTimeout(() => {
               clearInterval(pollInterval);
               setCallActive(false);
@@ -123,12 +117,10 @@ export default function ReactivationPanel({ onToast }: ReactivationPanelProps) {
     [updateEvent]
   );
 
-  const triggerOutboundCall = useCallback(async () => {
+  const triggerOutboundInboundCall = useCallback(async () => {
     if (callActive) return;
 
-    const name = patientName.trim() || "Anjali Sharma";
-    const doctor = doctorName.trim() || "Dr. Victor Mag";
-    const spec = specialty.trim() || "Dentist";
+    const name = patientName.trim() || "Patient";
     const ph = phone.trim();
 
     if (!ph || ph.replace(/\D/g, "").length < 10) {
@@ -155,9 +147,7 @@ export default function ReactivationPanel({ onToast }: ReactivationPanelProps) {
         body: JSON.stringify({
           patient_name: name,
           mobile_number: ph.replace(/\D/g, ""),
-          doctor_name: doctor,
-          doctor_specialty: spec,
-          agent_type: "reactivation",
+          agent_type: "inbound",
         }),
       });
 
@@ -170,7 +160,6 @@ export default function ReactivationPanel({ onToast }: ReactivationPanelProps) {
         // Start polling for live webhook events
         const interval = pollCallEvents(data.call_id);
 
-        // Cleanup on unmount
         return () => {
           if (interval) clearInterval(interval);
         };
@@ -187,12 +176,12 @@ export default function ReactivationPanel({ onToast }: ReactivationPanelProps) {
       }
       onToast(`Call failed: ${msg}`);
     }
-  }, [callActive, patientName, doctorName, specialty, phone, updateEvent, onToast, pollCallEvents]);
+  }, [callActive, patientName, phone, onToast, pollCallEvents, updateEvent]);
 
   const formatTime = (s: number) =>
     `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
 
-  const statValues = [stats.opdConsults, stats.followedUp, stats.booked, Math.round((stats.booked / stats.followedUp) * 100)];
+  const statValues = [840, 612, 495, 81];
   const statSuffixes = ["", "", "", "%"];
 
   return (
@@ -201,12 +190,12 @@ export default function ReactivationPanel({ onToast }: ReactivationPanelProps) {
       <div className="page-header">
         <div>
           <div className="card-title">
-            <span className="eyebrow-dot" style={{ color: "var(--green)", background: "var(--green)" }} />
-            Agent 3 · Outbound · Patient Reactivation
+            <span className="eyebrow-dot" style={{ color: "var(--blue)", background: "var(--blue)" }} />
+            Agent 1 · Outbound Dialer · Inbound Booking Agent
           </div>
-          <h2 className="page-title">Reactivation Dialler</h2>
+          <h2 className="page-title">Apt Booking Dialer</h2>
           <p className="page-sub">
-            Automated follow-up calls for post-OPD patients — schedule reviews, collect feedback, and drive rebookings.
+            Trigger outbound calls to route patients directly to the Ray Inbound AI Booking Agent receptionist flow.
           </p>
         </div>
         <div className="call-status-card">
@@ -228,13 +217,13 @@ export default function ReactivationPanel({ onToast }: ReactivationPanelProps) {
         <div className="glow-card dial-card-green" style={{ width: "100%" }}>
           <div className="glow-card-inner">
             <div className="dial-label dial-label-green">
-              🔄 Trigger Patient Reactivation Call
+              ☎️ Trigger Inbound Booking Outbound Call
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
               <input
                 type="text"
-                placeholder="Patient Name"
+                placeholder="Patient Name (e.g. Rohan Mehta)"
                 value={patientName}
                 onChange={(e) => setPatientName(e.target.value)}
                 className="text-input"
@@ -246,37 +235,21 @@ export default function ReactivationPanel({ onToast }: ReactivationPanelProps) {
                 </span>
                 <input
                   type="text"
-                  placeholder="Phone Number"
+                  placeholder="Phone Number (e.g. 9988776655)"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   className="phone-input green-focus"
                 />
               </div>
-              <input
-                type="text"
-                placeholder="Doctor Name"
-                value={doctorName}
-                onChange={(e) => setDoctorName(e.target.value)}
-                className="text-input"
-                style={{ marginBottom: 0 }}
-              />
-              <input
-                type="text"
-                placeholder="Specialty"
-                value={specialty}
-                onChange={(e) => setSpecialty(e.target.value)}
-                className="text-input"
-                style={{ marginBottom: 0 }}
-              />
             </div>
 
             <button
-              onClick={triggerOutboundCall}
+              onClick={triggerOutboundInboundCall}
               disabled={callActive}
               className={`trigger-btn btn-green${callActive ? " loading" : ""}`}
               style={{ marginTop: 16 }}
             >
-              {callActive ? `Call Active · ${formatTime(callTimer)}` : "Trigger Outbound Call"}
+              {callActive ? `Call Active · ${formatTime(callTimer)}` : "Trigger Inbound Booking Call"}
             </button>
           </div>
         </div>
@@ -286,7 +259,7 @@ export default function ReactivationPanel({ onToast }: ReactivationPanelProps) {
       <div>
         <div className="card" style={{ width: "100%" }}>
           <div className="card-title">
-            <span className="card-title-dot" style={{ background: "var(--green)" }} />
+            <span className="card-title-dot" style={{ background: "var(--blue)" }} />
             Event Timeline
           </div>
           <div className="event-log">
@@ -345,24 +318,23 @@ export default function ReactivationPanel({ onToast }: ReactivationPanelProps) {
 
       {/* ── Row 5: Queue ── */}
       <div>
-        {/* Reactivation Queue */}
         <div className="card" style={{ width: "100%" }}>
           <div className="card-title">
-            <span className="card-title-dot" style={{ background: "var(--green)" }} />
-            Reactivation Queue · This Month
+            <span className="card-title-dot" style={{ background: "var(--blue)" }} />
+            Inbound Call Queue · This Month
           </div>
 
           <table className="data-table">
             <thead>
               <tr>
                 <th>Patient</th>
-                <th>Consult Date</th>
+                <th>Call Date</th>
                 <th>Cohort</th>
                 <th>Status</th>
               </tr>
             </thead>
             <tbody>
-              {queuePatients.map((p) => (
+              {QUEUE_PATIENTS.map((p) => (
                 <tr key={p.id}>
                   <td>
                     <div className="patient-name">{p.name}</div>

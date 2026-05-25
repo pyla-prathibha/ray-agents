@@ -191,7 +191,7 @@ export default function InboundPanel({ onToast }: InboundPanelProps) {
           </div>
           <h2 className="page-title">Patient Call Trigger</h2>
           <p className="page-sub">
-            Simulate an inbound patient call to test the AI receptionist flow, Dhanvantri booking engine, and webhook pipeline.
+            Simulate an inbound patient call to test the AI receptionist flow, Ray booking engine, and webhook pipeline.
           </p>
         </div>
         <div className="call-status-card">

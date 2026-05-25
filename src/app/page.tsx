@@ -4,6 +4,7 @@ import { useState, useRef, useCallback } from "react";
 import { Topbar } from "@/components/layout/Topbar";
 import { Sidebar, type Panel } from "@/components/layout/Sidebar";
 import InboundPanel from "@/components/panels/InboundPanel";
+import BookingOutboundPanel from "@/components/panels/BookingOutboundPanel";
 import OutboundPanel from "@/components/panels/OutboundPanel";
 import ReactivationPanel from "@/components/panels/ReactivationPanel";
 import DemandGenPanel from "@/components/panels/DemandGenPanel";
@@ -42,6 +43,9 @@ export default function Dashboard() {
         <main className="main" ref={mainRef}>
           <div style={{ display: activePanel === "inbound" ? "block" : "none" }}>
             <InboundPanel onToast={showToast} />
+          </div>
+          <div style={{ display: activePanel === "booking-outbound" ? "block" : "none" }}>
+            <BookingOutboundPanel onToast={showToast} />
           </div>
           <div style={{ display: activePanel === "outbound" ? "block" : "none" }}>
             <OutboundPanel onToast={showToast} />
