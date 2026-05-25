@@ -34,12 +34,18 @@ export interface PractoDoctor {
 }
 
 export async function fetchEstablishment(clinicId: string): Promise<PractoEstablishment> {
-  const res = await fetch(`${config.practo.baseUrl}/establishments/${clinicId}`, {
+  const url = `${config.practo.baseUrl}/establishments/${clinicId}`;
+  console.log(`[PractoAPI] fetchEstablishment START clinicId=${clinicId} url=${url}`);
+  const startTime = Date.now();
+  const res = await fetch(url, {
     headers: headers(),
     cache: "no-store",
   });
-  if (!res.ok) throw new Error(`Establishment API failed: ${res.status}`);
+  const elapsed = Date.now() - startTime;
+  console.log(`[PractoAPI] fetchEstablishment RESPONSE clinicId=${clinicId} status=${res.status} elapsed=${elapsed}ms`);
+  if (!res.ok) throw new Error(`Establishment API failed: ${res.status} (took ${elapsed}ms)`);
   const data = await res.json();
+  console.log(`[PractoAPI] fetchEstablishment PARSED clinicId=${clinicId} doctorCount=${(data.data || data)?.doctors?.length ?? 0}`);
   
   // Extract from response shape
   const est = data.data || data;
@@ -59,12 +65,18 @@ export async function fetchEstablishment(clinicId: string): Promise<PractoEstabl
 }
 
 export async function fetchProvider(providerId: string, clinicId?: string): Promise<PractoDoctor> {
-  const res = await fetch(`${config.practo.baseUrl}/providers/${providerId}`, {
+  const url = `${config.practo.baseUrl}/providers/${providerId}`;
+  console.log(`[PractoAPI] fetchProvider START providerId=${providerId} clinicId=${clinicId} url=${url}`);
+  const startTime = Date.now();
+  const res = await fetch(url, {
     headers: headers(),
     cache: "no-store",
   });
-  if (!res.ok) throw new Error(`Provider API failed: ${res.status}`);
+  const elapsed = Date.now() - startTime;
+  console.log(`[PractoAPI] fetchProvider RESPONSE providerId=${providerId} status=${res.status} elapsed=${elapsed}ms`);
+  if (!res.ok) throw new Error(`Provider API failed: ${res.status} (took ${elapsed}ms)`);
   const data = await res.json();
+  console.log(`[PractoAPI] fetchProvider PARSED providerId=${providerId} name=${(data.data || data)?.name ?? 'unknown'}`);
   
   const doc = data.data || data;
   const reviews = doc.reviews || doc.review || {};

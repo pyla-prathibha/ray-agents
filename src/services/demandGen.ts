@@ -217,13 +217,17 @@ function getFallbackReport(): DemandGenReport {
 }
 
 export async function fetchClinicData(clinicId: string): Promise<ClinicDashboardData> {
+  console.log(`[DemandGen] fetchClinicData START clinicId=${clinicId}`);
+  const overallStart = Date.now();
   let clinic: PractoEstablishment;
   let doctors: PractoDoctor[] = [];
   let competitors: CompetitorSummary = { total_clinics_in_radius: 3, avg_rating: 4.7, top_competitors: [] };
   let our_monetisable_txns = 0;
 
   try {
+    const estStart = Date.now();
     clinic = await fetchEstablishment(clinicId);
+    console.log(`[DemandGen] Establishment fetched in ${Date.now() - estStart}ms, doctors=${clinic.doctors?.length ?? 0}`);
   } catch (err) {
     console.warn("[DemandGen] Establishment fetch failed:", err);
     clinic = {
@@ -240,6 +244,8 @@ export async function fetchClinicData(clinicId: string): Promise<ClinicDashboard
 
   // Fetch each doctor in parallel
   if (clinic.doctors && clinic.doctors.length > 0) {
+    console.log(`[DemandGen] Fetching ${clinic.doctors.length} providers in parallel for clinicId=${clinicId}`);
+    const providersStart = Date.now();
     const doctorPromises = clinic.doctors.map(async (doc) => {
       if (doc.id) {
         try {
@@ -253,6 +259,7 @@ export async function fetchClinicData(clinicId: string): Promise<ClinicDashboard
     });
     const fetchedDoctors = await Promise.all(doctorPromises);
     doctors = fetchedDoctors.filter((doc): doc is PractoDoctor => doc !== null);
+    console.log(`[DemandGen] All providers fetched in ${Date.now() - providersStart}ms, resolved=${doctors.length}/${clinic.doctors.length}`);
   }
 
   // Sort doctors by reviews.percentage descending, and then by response_count descending
@@ -516,6 +523,7 @@ export async function fetchClinicData(clinicId: string): Promise<ClinicDashboard
     report = getFallbackReport();
   }
 
+  console.log(`[DemandGen] fetchClinicData DONE clinicId=${clinicId} totalElapsed=${Date.now() - overallStart}ms doctors=${doctors.length} csvResolved=${csvResolved}`);
   return {
     clinic,
     doctors,
