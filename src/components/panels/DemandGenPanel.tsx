@@ -7,19 +7,9 @@ interface DemandGenPanelProps {
 }
 
 function hashClinicName(name: string): string {
-  const words = name.split(/\s+/);
-  const maskedWords = words.map((w) => {
-    const lower = w.toLowerCase();
-    if (["and", "n", "of", "the", "&", "or"].includes(lower)) {
-      return lower;
-    }
-    if (w.length <= 3) {
-      return w[0] + "•".repeat(w.length - 1);
-    }
-    return w.substring(0, 2) + "•".repeat(w.length - 2);
-  });
-  return maskedWords.join(" ");
+  return name.replace(/[a-zA-Z0-9]/g, "•");
 }
+
 
 function getClinicHash(name: string): string {
   let hash = 0;
