@@ -35,12 +35,17 @@ A real-time intelligence command center analyzing hyper-local search behavior an
 
 ## 🛠️ Technology Stack
 
-1. **Frontend**: Next.js 15 (App Router), React 19, TypeScript
-2. **Styling**: Modern CSS Variables, Harmonious HSL custom dark palettes, Backdrop filters (Glassmorphism), and premium micro-animations.
-3. **Services**:
-   * **RingAI Telephony Suite**: Live inbound and outbound agent orchestrations with webhook logs and waveform visualization.
-   * **Practo & Dhanvantri Bridge APIs**: Direct REST API integration for dynamic establishments, providers, and doctor search queries.
-   * **Anthropic Claude Engine**: AI analysis model generating hyper-local growth narratives and parsing telephone transcripts.
+| Layer | Tech |
+|---|---|
+| **Framework** | Next.js 16.2.6 (App Router) |
+| **UI** | React 19, TypeScript, Tailwind CSS 4, custom CSS variables for theming |
+| **Auth** | NextAuth.js v5 (Google OAuth, JWT sessions) |
+| **AI** | Claude Agent SDK, Anthropic SDK (claude-haiku-4-5) |
+| **Voice** | RingAI API (outbound calls, webhooks) |
+| **Backend APIs** | Practo Bridge API (clinic/doctor data) |
+| **State** | In-memory (call event store), no database |
+| **Styling** | Tailwind + CSS custom properties (dark/light theme via `data-theme`) |
+| **Deployment** | ray-ai-demos.practo.com |
 
 ---
 
